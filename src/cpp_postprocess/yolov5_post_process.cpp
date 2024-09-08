@@ -486,7 +486,25 @@ void Yolov5doProcess(hbDNNTensor *tensor, Yolov5PostProcessInfo_t *post_info, in
                             bbox,
                             default_yolov5_config.class_names[(int)id].c_str());
         }
-        data = data + num_pred * anchors.size();
+        /*
+        This is a temporary modification plan. The reason is that during debugging, it was discovered that tensor data
+        becomes zero in the last segment and causes access exceptions. This issue does not occur with TROS. Due to time
+        constraints and the inability to identify the root cause at the moment, this is a temporary commit. If a better
+        solution is found, it will need to be deleted and revised.
+        */
+        if (h == height - 1) {
+            bool all_zero = true;
+            for (int j = 0; j < num_pred; j++) {
+                if (data[j] != 0) {
+                    all_zero = false;
+                }
+            }
+            if (all_zero) {
+                // std::cout << "All num_pred values are zero in the last row (h: " << h << ", w: " << w <<  ")" << std::endl;
+                break;
+            }
+        }
+        data = data + num_pred * anchors.size() + 1;
       }
     }
   } else {

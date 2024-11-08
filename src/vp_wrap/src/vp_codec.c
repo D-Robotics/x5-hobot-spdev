@@ -836,8 +836,8 @@ int32_t vp_codec_get_output(media_codec_context_t *context, ImageFrame *frame, i
 		}
 		else
 		{
-				SC_LOGD("info->video_frame_info.decode_result: %d, buffer->vframe_buf.size: %d",
-					info->video_frame_info.decode_result, buffer->vframe_buf.size);
+			SC_LOGD("info->video_frame_info.decode_result: %d, buffer->vframe_buf.size: %d",
+				info->video_frame_info.decode_result, buffer->vframe_buf.size);
 			if (info->video_frame_info.decode_result == 0 || buffer->vframe_buf.size == 0) {
 				return 0;
 			}
@@ -1009,8 +1009,11 @@ void vp_decode_work_func(void *param)
 			{
 				if (seqHeaderSize)
 				{
-					frame.data[0] = (void *)seqHeader;
-					frame.data_size[0] = seqHeaderSize;
+					/* Temporarily modify the solution and track more versions to see if it can cover more test cases to support this change. */
+					// frame.data[0] = (void *)seqHeader;
+					// frame.data_size[0] = seqHeaderSize;
+					frame.data[0] = (void *)avpacket.data;
+					frame.data_size[0] = avpacket.size;
 					vp_codec_set_input(context, &frame, eos);
 				}
 				else

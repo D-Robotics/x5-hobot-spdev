@@ -5,7 +5,7 @@
 #define SENSOE_FPS 30
 #define RAW10 0x2B
 
-static mipi_config_t imx219_mipi_config = {
+static mipi_config_t sc231ai_mipi_config = {
 	.rx_enable = 1,
 	.rx_attr = {
 		.phy = 0,
@@ -13,38 +13,34 @@ static mipi_config_t imx219_mipi_config = {
 		.datatype = RAW10,
 		.fps = SENSOE_FPS,
 		.mclk = 24,
-		.mipiclk = 1728,
+		.mipiclk = 396,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 3448,
-		.framelenth = 1166,
-		.settle = 30,
+		.linelenth = 2198,
+		.framelenth = 1125,
+		.settle = 22,
 		.channel_num = 1,
 		.channel_sel = {0},
 	},
-	.rx_ex_mask = 0x40,
-	.rx_attr_ex = {
-		.stop_check_instart = 1,
-	}
 };
 
-static camera_config_t imx219_camera_config = {
-	.name = "imx219",
-	.addr = 0x10,
-	.sensor_mode = 1,
+static camera_config_t sc231ai_camera_config = {
+	.name = "sc231ai",
+	.addr = 0x30,
+	.sensor_mode = NORMAL_M,
 	.fps = SENSOE_FPS,
 	.format = RAW10,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
-	.mipi_cfg = &imx219_mipi_config,
-	.calib_lname = "/usr/hobot/bin/imx219_tuning_1920x1080.json",
+	.mipi_cfg = &sc231ai_mipi_config,
+	.calib_lname = "disable",
 };
 
-static vin_node_attr_t imx219_vin_node_attr = {
+static vin_node_attr_t sc231ai_vin_node_attr = {
 	.cim_attr = {
-		.mipi_rx = 2,
+		.mipi_rx = 3,
 		.vc_index = 0,
 		.ipi_channel = 1,
 		.cim_isp_flyby = 1,
@@ -58,13 +54,13 @@ static vin_node_attr_t imx219_vin_node_attr = {
 	},
 };
 
-static vin_ichn_attr_t imx219_vin_ichn_attr = {
+static vin_ichn_attr_t sc231ai_vin_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.format = RAW10,
 };
 
-static vin_ochn_attr_t imx219_vin_ochn_attr = {
+static vin_ochn_attr_t sc231ai_vin_ochn_attr = {
 	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
@@ -75,7 +71,7 @@ static vin_ochn_attr_t imx219_vin_ochn_attr = {
 	},
 };
 
-static isp_attr_t imx219_isp_attr = {
+static isp_attr_t sc231ai_isp_attr = {
 	.input_mode = 1, // 0: online, 1: mcm, 类似offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
@@ -86,30 +82,30 @@ static isp_attr_t imx219_isp_attr = {
 	},
 };
 
-static isp_ichn_attr_t imx219_isp_ichn_attr = {
+static isp_ichn_attr_t sc231ai_isp_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.fmt = FRM_FMT_RAW,
 	.bit_width = 10,
 };
 
-static isp_ochn_attr_t imx219_isp_ochn_attr = {
+static isp_ochn_attr_t sc231ai_isp_ochn_attr = {
 	.ddr_en = 1,
 	.fmt = FRM_FMT_NV12,
 	.bit_width = 8,
 };
 
-vp_sensor_config_t imx219_linear_1920x1080_raw10_30fps_2lane = {
-	.chip_id_reg = 0x0000,
-	.chip_id = 0x0219,
-	.sensor_i2c_addr_list = {0x10},
-	.sensor_name = "imx219-1920x1080-30fps",
+vp_sensor_config_t sc231ai_linear_1920x1080_raw10_30fps_2lane = {
+	.chip_id_reg = 0x3107,
+	.chip_id = 0xcb6a,
+	.sensor_i2c_addr_list = {0x30, 0x32},
+	.sensor_name = "sc231ai-30fps",
 	.config_file = "linear_1920x1080_raw10_30fps_2lane.c",
-	.camera_config = &imx219_camera_config,
-	.vin_ichn_attr = &imx219_vin_ichn_attr,
-	.vin_node_attr = &imx219_vin_node_attr,
-	.vin_ochn_attr = &imx219_vin_ochn_attr,
-	.isp_attr      = &imx219_isp_attr,
-	.isp_ichn_attr = &imx219_isp_ichn_attr,
-	.isp_ochn_attr = &imx219_isp_ochn_attr,
+	.camera_config = &sc231ai_camera_config,
+	.vin_ichn_attr = &sc231ai_vin_ichn_attr,
+	.vin_node_attr = &sc231ai_vin_node_attr,
+	.vin_ochn_attr = &sc231ai_vin_ochn_attr,
+	.isp_attr      = &sc231ai_isp_attr,
+	.isp_ichn_attr = &sc231ai_isp_ichn_attr,
+	.isp_ochn_attr = &sc231ai_isp_ochn_attr,
 };

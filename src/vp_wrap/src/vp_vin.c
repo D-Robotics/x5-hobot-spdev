@@ -29,7 +29,8 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 	// 调整 mipi_rx 的 index
 	vin_node_attr->cim_attr.mipi_rx = vp_vflow_contex->mipi_csi_rx_index;
 	uint32_t hw_id = vin_node_attr->cim_attr.mipi_rx;
-	uint32_t chn_id = 0;
+	uint32_t ichn_id = 0;
+	uint32_t ochn_id = 0;
 	uint64_t vin_attr_ex_mask = 0;
 	hbn_vnode_handle_t *vin_node_handle = &vp_vflow_contex->vin_node_handle;
 	vin_attr_ex_t vin_attr_ex;
@@ -54,12 +55,12 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 	ret = hbn_vnode_set_attr(*vin_node_handle, vin_node_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_attr");
 	// 设置输入通道的属性
-	ret = hbn_vnode_set_ichn_attr(*vin_node_handle, chn_id, vin_ichn_attr);
+	ret = hbn_vnode_set_ichn_attr(*vin_node_handle, ichn_id, vin_ichn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ichn_attr");
 	// 设置输出通道的属性
 	// 使能DDR输出
 	vin_ochn_attr->ddr_en = 1;
-	ret = hbn_vnode_set_ochn_attr(*vin_node_handle, chn_id, vin_ochn_attr);
+	ret = hbn_vnode_set_ochn_attr(*vin_node_handle, ochn_id, vin_ochn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_attr");
 	vin_attr_ex_mask = vin_attr_ex.vin_attr_ex_mask;
 	if (vin_attr_ex_mask) {
@@ -80,7 +81,7 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 						| HB_MEM_USAGE_CACHED
 						| HB_MEM_USAGE_HW_CIM
 						| HB_MEM_USAGE_GRAPHIC_CONTIGUOUS_BUF;
-	ret = hbn_vnode_set_ochn_buf_attr(*vin_node_handle, chn_id, &alloc_attr);
+	ret = hbn_vnode_set_ochn_buf_attr(*vin_node_handle, ochn_id, &alloc_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_buf_attr");
 	SC_LOGD("successful");
 	return 0;

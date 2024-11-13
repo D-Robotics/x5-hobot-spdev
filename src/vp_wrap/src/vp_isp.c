@@ -25,7 +25,8 @@ int32_t vp_isp_init(vp_vflow_contex_t *vp_vflow_contex)
 	isp_ochn_attr_t *isp_ochn_attr = NULL;
 	hbn_vnode_handle_t *isp_node_handle = NULL;
 	hbn_buf_alloc_attr_t alloc_attr = {0};
-	uint32_t chn_id = 0;
+	uint32_t ichn_id = 0;
+	uint32_t ochn_id = 0;
 
 	sensor_config = vp_vflow_contex->sensor_config;
 	isp_attr = sensor_config->isp_attr;
@@ -38,9 +39,9 @@ int32_t vp_isp_init(vp_vflow_contex_t *vp_vflow_contex)
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_open");
 	ret = hbn_vnode_set_attr(*isp_node_handle, isp_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_attr");
-	ret = hbn_vnode_set_ochn_attr(*isp_node_handle, chn_id, isp_ochn_attr);
+	ret = hbn_vnode_set_ochn_attr(*isp_node_handle, ochn_id, isp_ochn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_attr");
-	ret = hbn_vnode_set_ichn_attr(*isp_node_handle, chn_id, isp_ichn_attr);
+	ret = hbn_vnode_set_ichn_attr(*isp_node_handle, ichn_id, isp_ichn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ichn_attr");
 
 	alloc_attr.buffers_num = 3;
@@ -50,7 +51,7 @@ int32_t vp_isp_init(vp_vflow_contex_t *vp_vflow_contex)
 						| HB_MEM_USAGE_CACHED
 						| HB_MEM_USAGE_HW_ISP
 						| HB_MEM_USAGE_GRAPHIC_CONTIGUOUS_BUF;
-	ret = hbn_vnode_set_ochn_buf_attr(*isp_node_handle, chn_id, &alloc_attr);
+	ret = hbn_vnode_set_ochn_buf_attr(*isp_node_handle, ochn_id, &alloc_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_buf_attr");
 
 	SC_LOGD("successful");

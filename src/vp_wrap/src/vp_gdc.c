@@ -149,13 +149,14 @@ int32_t vp_gdc_init(vp_vflow_contex_t *vp_vflow_contex){
 		return -1;
 	}
 
-	uint32_t chn_id = 0;
+	uint32_t ichn_id = 0;
+	uint32_t ochn_id = 0;
 
 	gdc_ichn_attr_t gdc_ichn_attr = {0};
 	gdc_ichn_attr.input_width = vp_vflow_contex->gdc_info.input_width;
 	gdc_ichn_attr.input_height = vp_vflow_contex->gdc_info.input_height;
 	gdc_ichn_attr.input_stride = vp_vflow_contex->gdc_info.input_width;
-	ret = hbn_vnode_set_ichn_attr(vp_vflow_contex->gdc_info.gdc_fd, chn_id, &gdc_ichn_attr);
+	ret = hbn_vnode_set_ichn_attr(vp_vflow_contex->gdc_info.gdc_fd, ichn_id, &gdc_ichn_attr);
 	if(ret != 0){
 		SC_LOGE("%s is enable gdc and gdc bin file [%s] is valid, but set ichn failed %d.",
 			vp_vflow_contex->gdc_info.sensor_name, gdc_bin_file, ret);
@@ -166,7 +167,7 @@ int32_t vp_gdc_init(vp_vflow_contex_t *vp_vflow_contex){
 	gdc_ochn_attr.output_width = vp_vflow_contex->gdc_info.input_width;
 	gdc_ochn_attr.output_height = vp_vflow_contex->gdc_info.input_height;
 	gdc_ochn_attr.output_stride = vp_vflow_contex->gdc_info.input_width;
-	ret = hbn_vnode_set_ochn_attr(vp_vflow_contex->gdc_info.gdc_fd, chn_id, &gdc_ochn_attr);
+	ret = hbn_vnode_set_ochn_attr(vp_vflow_contex->gdc_info.gdc_fd, ochn_id, &gdc_ochn_attr);
 	if(ret != 0){
 		SC_LOGE("%s is enable gdc and gdc bin file [%s] is valid, but set ochn failed %d.",
 			vp_vflow_contex->gdc_info.sensor_name, gdc_bin_file, ret);
@@ -178,7 +179,7 @@ int32_t vp_gdc_init(vp_vflow_contex_t *vp_vflow_contex){
 	alloc_attr.flags = HB_MEM_USAGE_CPU_READ_OFTEN |
 					HB_MEM_USAGE_CPU_WRITE_OFTEN |
 					HB_MEM_USAGE_CACHED;
-	ret = hbn_vnode_set_ochn_buf_attr(vp_vflow_contex->gdc_info.gdc_fd, chn_id, &alloc_attr);
+	ret = hbn_vnode_set_ochn_buf_attr(vp_vflow_contex->gdc_info.gdc_fd, ochn_id, &alloc_attr);
 	if(ret != 0){
 		SC_LOGE("%s is enable gdc and gdc bin file [%s] is valid, but set ochn buffer failed %d.",
 			vp_vflow_contex->gdc_info.sensor_name, gdc_bin_file, ret);

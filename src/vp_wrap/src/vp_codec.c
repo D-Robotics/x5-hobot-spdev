@@ -446,8 +446,8 @@ int32_t vp_decode_config_param(media_codec_context_t *context, media_codec_id_t 
 	params->feed_mode = MC_FEEDING_MODE_FRAME_SIZE;
 	params->pix_fmt = MC_PIXEL_FORMAT_NV12;
 	params->bitstream_buf_size = (width * height * 3 / 2  + 0x3ff) & ~0x3ff;
-	params->bitstream_buf_count = 6;
-	params->frame_buf_count = 6;
+	params->bitstream_buf_count = 10;
+	params->frame_buf_count = 10;
 
 	switch (codec_type)
 	{
@@ -696,6 +696,26 @@ int32_t vp_codec_set_input(media_codec_context_t *context, ImageFrame *frame, in
 {
 	int32_t ret = 0;
 	media_codec_buffer_t *buffer = NULL;
+	mc_inter_status_t status;
+	hb_mm_mc_get_status(context, &status);
+	SC_LOGD("idx: %d , output count %d input count %d , frame->frame_id = %d\n",context->instance_index, status.cur_output_buf_cnt, status.cur_input_buf_cnt , frame->frame_id);
+
+	//If the input buffer count is full, cannot dequeue from it. Have to wait until items are taken out from the output_buf queue.
+	if(status.cur_input_buf_cnt >= context->video_dec_params.frame_buf_count)
+	{
+		SC_LOGD("idx: %d , input_buf is full",context->instance_index);
+		//Encountered multiple situations where the input buffer was full, so it's necessary to check the status of the codec.
+		hb_mm_mc_get_status(context, &status);
+		SC_LOGD("idx: %d , codec_status : total input_buf_size = %d",context->instance_index , status.total_input_buf_cnt);
+		return -1;
+	}
+
+	//If the input buffer count is zero, make a print statement to indicate that there is no data being input into the input_buf queue.
+	if(status.cur_input_buf_cnt == 0)
+	{
+		SC_LOGD("idx: %d , input_buf is empty",context->instance_index);
+		// return -1;
+	}
 
 	if ((context == NULL) || (frame == NULL))
 	{
@@ -709,7 +729,20 @@ int32_t vp_codec_set_input(media_codec_context_t *context, ImageFrame *frame, in
 	if (ret != 0)
 	{
 		SC_LOGE("hb_mm_mc_dequeue_input_buffer failed ret = %d", ret);
-		return -1;
+		//It might be because the output buffer is full; try printing it out to take a look.
+		mc_inter_status_t status;
+		hb_mm_mc_get_status(context, &status);
+		SC_LOGE("idx: %d output count %d input count %d , frame->frame_id = %d\n",context->instance_index, status.cur_output_buf_cnt, status.cur_input_buf_cnt , frame->frame_id);
+
+		//try again
+		ret = hb_mm_mc_dequeue_input_buffer(context, buffer, 100);
+		printf("try vp_codec_set_input : hb_mm_mc_queue_input_buffer ret = %d\n", ret);
+		if(ret != 0)
+		{
+			//still failed
+			SC_LOGE("idx: %d double hb_mm_mc_dequeue_input_buffer failed!!! ret = %d",ret);
+			return -1;
+		}
 	}
 
 	if (context->encoder == true)
@@ -791,6 +824,30 @@ int32_t vp_codec_get_output(media_codec_context_t *context, ImageFrame *frame, i
 	media_codec_output_buffer_info_t *info = NULL;
 	media_codec_buffer_t *buffer = NULL;
 
+	mc_inter_status_t status;
+	hb_mm_mc_get_status(context, &status);
+	SC_LOGD("idx: %d , output count %d input count %d , frame->frame_id = %d\n",context->instance_index, status.cur_output_buf_cnt, status.cur_input_buf_cnt , frame->frame_id);
+	//If the output buffer count is full, then it cannot be dequeued, need to quickly dequeue the queue or take other actions.
+	if(status.cur_output_buf_cnt >= context->video_dec_params.frame_buf_count)
+	{
+		SC_LOGD("idx: %d , output_buf is full",context->instance_index);
+		return -1;
+	}
+
+	//If the output buffer count is 0, then dequeueing is not possible, and it will result in a timeout.
+	if(status.cur_output_buf_cnt == 0)
+	{
+		printf("idx: %d , output_buf no resources\n",context->instance_index);
+		SC_LOGD("idx: %d , output_buf no resources",context->instance_index);
+		// cannot wait too long
+		usleep(30*1000);
+		//Retrieve the status again, and if it's still equal to zero, then return to check once more.
+		hb_mm_mc_get_status(context, &status);
+		if(status.cur_output_buf_cnt == 0)
+		{
+			return -1;
+		}
+	}
 	if ((context == NULL) || (frame == NULL))
 	{
 		SC_LOGE("codec param is NULL");

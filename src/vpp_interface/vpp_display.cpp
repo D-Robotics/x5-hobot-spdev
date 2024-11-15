@@ -470,10 +470,10 @@ int32_t VPPDisplay::SetImageFrame(ImageFrame *frame) {
 		currentRenderBufferIndex = (currentRenderBufferIndex + 1) % 2;
 
 	} else if (1 == m_display_mode) {
-		std::vector<uint8_t> rgbaData(frame->width * frame->height * 4);
+		std::vector<uint8_t> rgbaData(m_width * m_height * 4);
 
 		// Convert NV12 to RGBA in the main thread (producer)
-		NV12ToRGBA(currentBuffer.buffer.virt_addr[0], rgbaData.data(), frame->width, frame->height);
+		NV12ToRGBA(currentBuffer.buffer.virt_addr[0], rgbaData.data(), m_width, m_height);
 
 		// Lock and push the converted RGBA data into the queue
 		{

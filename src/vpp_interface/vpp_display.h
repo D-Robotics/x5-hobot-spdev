@@ -83,6 +83,8 @@ namespace spdev
 		int32_t SetGraphWord(int32_t x, int32_t y, char *str,
 							 int32_t flush = 0, uint32_t color = 0xffff0000, int32_t line_width = 1);
 
+		int32_t GetDisplayRes(int32_t *width , int32_t *height);
+
 		void startProcessingThread();
 		void stopProcessingThread();
 

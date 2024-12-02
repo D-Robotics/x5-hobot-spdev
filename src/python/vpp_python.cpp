@@ -861,6 +861,24 @@ extern "C"
 		return Py_BuildValue("i", pobj->SetGraphWord(x, y, PyBytes_AsString(str_obj), flush, (uint32_t)color, line_width));
 	}
 
+	static PyObject *Display_get_display_res(libsppydev_Object *self)
+	{
+		VPPDisplay *pobj = (VPPDisplay *)self->pobj;
+
+		//列表的大小暂时由这里定义，维护的时候根据具体情况更改。
+		int disp_w_list[20] = {0};
+		int disp_h_list[20] = {0};
+
+		pobj->GetDisplayRes(disp_w_list , disp_h_list);
+		PyObject* list = PyList_New(0);
+		for (int i = 0; i < sizeof(disp_w_list) / sizeof(disp_w_list[0]); i++) {
+			PyObject* tuple = Py_BuildValue("(ii)", disp_w_list[i], disp_h_list[i]);
+			PyList_Append(list, tuple);
+			Py_DECREF(tuple);
+		}
+		return list;
+	}
+
 	static PyObject *Display_close(libsppydev_Object *self)
 	{
 		if (!self->pobj)
@@ -1072,6 +1090,7 @@ extern "C"
 		{"set_img", (PyCFunction)Display_set_img, METH_VARARGS | METH_KEYWORDS, "Set display image"},
 		{"set_graph_rect", (PyCFunction)Display_set_graph_rect, METH_VARARGS | METH_KEYWORDS, "Set display grapth rect"},
 		{"set_graph_word", (PyCFunction)Display_set_graph_word, METH_VARARGS | METH_KEYWORDS, "Set display grapth word"},
+		{"get_display_res", (PyCFunction)Display_get_display_res, METH_NOARGS, "Get display res"},
 		{"close", (PyCFunction)Display_close, METH_NOARGS, "Closes Display."},
 		{nullptr, nullptr, 0, nullptr},
 	};

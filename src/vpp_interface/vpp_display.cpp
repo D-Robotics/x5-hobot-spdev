@@ -554,6 +554,11 @@ int32_t VPPDisplay::SetGraphWord(int32_t x, int32_t y, char *str,
 	return ret;
 }
 
+int32_t VPPDisplay::GetDisplayRes(int32_t *width , int32_t *height)
+{
+	return vp_display_get_res(width , height);
+}
+
 void VPPDisplay::startProcessingThread() {
 	stopProcessing = false;
 	// Start the consumer thread to process RGBA queue

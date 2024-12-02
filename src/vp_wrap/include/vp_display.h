@@ -100,6 +100,7 @@ void vp_display_draw_rect(uint8_t *frame, int32_t x0, int32_t y0, int32_t x1, in
 	int32_t line_width);
 int32_t vp_display_draw_word(uint8_t *addr, int32_t x, int32_t y, char *str,
 	int32_t width, int32_t color, int32_t line_width);
+int32_t vp_display_get_res(int32_t *width , int32_t *height);
 
 #ifdef __cplusplus
 }

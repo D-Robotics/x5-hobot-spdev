@@ -759,9 +759,9 @@ static PyObject *Model_forward(Model_Object *self, PyObject *args, PyObject *kwa
     }
 
     // 将 Python 对象转换为 NumPy 数组
-    PyArrayObject* arg_array = (PyArrayObject*)PyArray_FROM_OTF(arg_obj, NPY_UBYTE, NPY_ARRAY_IN_ARRAY);
+    PyArrayObject* arg_array = (PyArrayObject*)PyArray_FROM_OTF(arg_obj, NPY_UBYTE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_FORCECAST);
     if (arg_array == NULL) {
-        PyErr_SetString(PyExc_TypeError, "Input must be a NumPy array of type uint8.");
+        PyErr_SetString(PyExc_TypeError, "NumPy array conversion failed.");
         Py_RETURN_NONE;
     }
 

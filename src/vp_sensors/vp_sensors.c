@@ -939,7 +939,7 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 			j = 0;
 			if(sensor_n > 1)
 			{
-				printf("plase chouse sensor config,the number should small than %d\n",sensor_n);
+				printf("plase choose sensor config,the number should small than %d\n",sensor_n);
 				scanf("%d", &j);
 				if (j >= sensor_n) 
 				{

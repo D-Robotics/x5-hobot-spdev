@@ -1,4 +1,4 @@
-// Copyright (c) 2024，D-Robotics.
+// Copyright (c) 2024 ， D-Robotics.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -702,20 +702,69 @@ static PyObject* model_get_estimate_latency(Model_Object *self, void *closure) {
     return PyLong_FromLong(self->m_estimate_latency);
 }
 
-static int32_t forward(Model_Object *model_obj, unsigned char *data_ptr, int32_t data_size, int32_t core_id, int32_t priority) {
+static int32_t forward(
+    Model_Object *model_obj,
+    const std::vector<unsigned char *> &data_ptrs,  // 多个输入数据指针
+    const std::vector<int32_t> &data_sizes,        // 每个输入数据的大小
+    int32_t core_id,
+    int32_t priority) {
+
+    // 检查 model_obj 初始化是否正确
+    if (!model_obj || !model_obj->m_inputs || !model_obj->m_outputs || !model_obj->m_dnn_handle) {
+        std::cerr << "Error: Model object or its members are not properly initialized." << std::endl;
+        return -1;
+    }
+
     int32_t ret = 0;
     uint32_t input_count = model_obj->m_input_count;
 
-    for (uint32_t index = 0; index < input_count; index++) {
-        hbDNNTensor *input_tensor = &model_obj->m_inputs[index];
-        auto tensor_type = static_cast<hbDNNDataType>(input_tensor->properties.tensorType);
+    // 确保数据大小和输入数量匹配
+    if (data_ptrs.size() > input_count) {
+        std::cerr << "Error: Too many inputs for the model!" << std::endl;
+        return -1;
+    }
 
-        // 将数据拷贝到输入张量的系统内存中
+    // 遍历每个输入数据
+    for (size_t idx = 0; idx < data_ptrs.size(); ++idx) {
+        unsigned char *data_ptr = data_ptrs[idx];
+        int32_t data_size = data_sizes[idx];
+
+        // 检查数据指针和大小有效性
+        if (!data_ptr) {
+            std::cerr << "Error: Null data pointer for input " << idx << std::endl;
+            return -1;
+        }
+        if (data_size <= 0) {
+            std::cerr << "Error: Invalid data size (" << data_size << ") for input " << idx << std::endl;
+            return -1;
+        }
+
+        // 获取对应的输入张量
+        if (idx >= input_count) {
+            std::cerr << "Error: Input tensor index out of bounds! Index: " << idx << ", input_count: " << input_count << std::endl;
+            return -1;
+        }
+        hbDNNTensor *input_tensor = &model_obj->m_inputs[idx];
+        if (!input_tensor || !input_tensor->sysMem[0].virAddr) {
+            std::cerr << "Error: Invalid input tensor or system memory for input " << idx << std::endl;
+            return -1;
+        }
+
+        auto tensor_type = static_cast<hbDNNDataType>(input_tensor->properties.tensorType);
+        // // 调试再打开
+        // PySys_WriteStdout("Processing input tensor, index = %zu, data_size = %d, tensor_type = %d\n", idx, data_size , tensor_type);
+
+        // 根据 tensor 类型拷贝数据到系统内存
         if (tensor_type == HB_DNN_IMG_TYPE_NV12_SEPARATE) {
+            if (!input_tensor->sysMem[1].virAddr) {
+                std::cerr << "Error: Invalid system memory for NV12_SEPARATE input " << idx << std::endl;
+                return -1;
+            }
             memcpy(input_tensor->sysMem[0].virAddr, data_ptr, data_size / 3 * 2);
             memcpy(input_tensor->sysMem[1].virAddr, data_ptr + data_size / 3 * 2, data_size / 3);
             hbSysFlushMem(&input_tensor->sysMem[0], HB_SYS_MEM_CACHE_CLEAN);
             hbSysFlushMem(&input_tensor->sysMem[1], HB_SYS_MEM_CACHE_CLEAN);
+
         } else if (tensor_type == HB_DNN_IMG_TYPE_Y || tensor_type == HB_DNN_IMG_TYPE_NV12) {
             memcpy(input_tensor->sysMem[0].virAddr, data_ptr, data_size);
             hbSysFlushMem(&input_tensor->sysMem[0], HB_SYS_MEM_CACHE_CLEAN);
@@ -725,6 +774,7 @@ static int32_t forward(Model_Object *model_obj, unsigned char *data_ptr, int32_t
         }
     }
 
+    // 设置推理控制参数
     hbDNNTaskHandle_t task_handle = NULL;
     hbDNNInferCtrlParam ctrl_param;
     HB_DNN_INITIALIZE_INFER_CTRL_PARAM(&ctrl_param);
@@ -737,35 +787,39 @@ static int32_t forward(Model_Object *model_obj, unsigned char *data_ptr, int32_t
     // 执行推理
     ret = hbDNNInfer(&task_handle, &output, model_obj->m_inputs, model_obj->m_dnn_handle, &ctrl_param);
     if (ret) {
-        std::cout << "hbDNNInfer failed" << std::endl;
+        std::cerr << "hbDNNInfer failed" << std::endl;
         return -1;
     }
+
     // 等待任务完成
     ret = hbDNNWaitTaskDone(task_handle, 0);
     if (ret) {
-        std::cout << "hbDNNWaitTaskDone failed" << std::endl;
+        std::cerr << "hbDNNWaitTaskDone failed" << std::endl;
         return -1;
     }
 
     // 确保 CPU 从 DDR 中读取数据之后再使用输出张量数据
     for (int32_t i = 0; i < model_obj->m_output_count; i++) {
+        if (!output[i].sysMem[0].virAddr) {
+            std::cerr << "Error: Output tensor system memory is invalid for index " << i << std::endl;
+            return -1;
+        }
         hbSysFlushMem(&output[i].sysMem[0], HB_SYS_MEM_CACHE_INVALIDATE);
     }
 
     // 释放任务句柄
     ret = hbDNNReleaseTask(task_handle);
     if (ret) {
-        std::cout << "hbDNNReleaseTask failed" << std::endl;
+        std::cerr << "hbDNNReleaseTask failed" << std::endl;
         return -1;
     }
     task_handle = NULL;
-
-
     return 0;
 }
 
-static PyObject *Model_forward(Model_Object *self, PyObject *args, PyObject *kwargs)
-{
+
+
+static PyObject *Model_forward(Model_Object *self, PyObject *args, PyObject *kwargs) {
     PyObject *arg_obj = NULL;
     int core_id = 0;
     int priority = 0;
@@ -773,42 +827,89 @@ static PyObject *Model_forward(Model_Object *self, PyObject *args, PyObject *kwa
     // 定义参数的关键字
     static const char *keywords[] = {"arg", "core_id", "priority", NULL};
 
+    // 初始化 NumPy API
+    import_array();
+
     // 解析参数
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|ii", const_cast<char **>(keywords), &arg_obj, &core_id, &priority)) {
+        PyErr_SetString(PyExc_TypeError, "Failed to parse arguments.");
         Py_RETURN_NONE;
     }
 
-    // 将 Python 对象转换为 NumPy 数组
-    PyArrayObject* arg_array = (PyArrayObject*)PyArray_FROM_OTF(arg_obj, NPY_UBYTE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_FORCECAST);
-    if (arg_array == NULL) {
-        PyErr_SetString(PyExc_TypeError, "NumPy array conversion failed.");
-        Py_RETURN_NONE;
+    // // 打印参数类型（调试用）
+    // PySys_WriteStdout("Type of args: %s\n", args->ob_type->tp_name);
+    // PySys_WriteStdout("Type of arg_obj: %s\n", arg_obj->ob_type->tp_name);
+    // PySys_WriteStdout("arg_obj type: %s\n", Py_TYPE(arg_obj)->tp_name);
+
+    std::vector<unsigned char *> data_ptrs;  // 用于存储数据指针
+    std::vector<int32_t> data_sizes;         // 用于存储数据大小
+
+    // 检查 arg_obj 是否是 NumPy 数组
+    if (PyArray_Check(arg_obj)) {
+        // 如果 arg_obj 已经是 NumPy 数组，直接处理
+        // PySys_WriteStdout("arg_obj is already a numpy.ndarray.\n");
+
+        // 将 arg_obj 转换为 PyArrayObject
+        PyArrayObject* arg_array = (PyArrayObject*)arg_obj;
+
+        // 获取数据指针和大小
+        unsigned char *arg_data_ptr = (unsigned char *)PyArray_DATA(arg_array);
+        npy_intp *arg_dims = PyArray_DIMS(arg_array);
+
+        int numpy_size = 1; // 计算 NumPy 数据的总大小
+        for (int j = 0; j < PyArray_NDIM(arg_array); ++j) {
+            numpy_size *= (int)arg_dims[j];
+        }
+
+        data_ptrs.push_back(arg_data_ptr);
+        data_sizes.push_back(numpy_size);
+
+
+    } else if (PyList_Check(arg_obj) || PyTuple_Check(arg_obj)) {
+        // 如果 arg_obj 是容器类型（列表或元组），检查每个元素是否是 NumPy 数组
+        Py_ssize_t size = PySequence_Size(arg_obj);
+
+        for (Py_ssize_t i = 0; i < size; ++i) {
+            PyObject *item = PySequence_Fast_GET_ITEM(arg_obj, i); // 不增加引用计数
+
+            if (!PyArray_Check(item)) {
+                PyErr_SetString(PyExc_TypeError, "Each element in arg_obj must be a NumPy array.");
+                Py_RETURN_NONE;
+            }
+
+            // 如果是 NumPy 数组，转换并获取数据指针和大小
+            PyArrayObject *arg_array = (PyArrayObject *)PyArray_FROM_OTF(item, NPY_UBYTE, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_FORCECAST);
+            if (!arg_array) {
+                PyErr_SetString(PyExc_TypeError, "Failed to convert item to NumPy array.");
+                Py_RETURN_NONE;
+            }
+
+            unsigned char *arg_data_ptr = (unsigned char *)PyArray_DATA(arg_array);
+            npy_intp *arg_dims = PyArray_DIMS(arg_array);
+
+            int numpy_size = 1; // 计算 NumPy 数据的总大小
+            for (int j = 0; j < PyArray_NDIM(arg_array); ++j) {
+                numpy_size *= (int)arg_dims[j];
+            }
+
+            data_ptrs.push_back(arg_data_ptr);
+            data_sizes.push_back(numpy_size);
+
+            // 释放引用，避免内存泄漏
+            Py_DECREF(arg_array);
+        }
+    } else {
+        PySys_WriteStdout("arg_obj is NOT a container.\n");
     }
 
-    // 获取图像数据的指针
-    unsigned char* arg_data_ptr = (unsigned char*)PyArray_DATA(arg_array);
+    // 调用 forward 函数，并传递处理后的参数
+    int32_t result = forward(self, data_ptrs, data_sizes, core_id, priority);
 
-    // 获取图像数据的形状信息
-    npy_intp* arg_dims = PyArray_DIMS(arg_array);
-    int arg_height = (int)arg_dims[0];
-    int arg_width = (int)arg_dims[1];
-    int arg_channels = (int)arg_dims[2];
-
-    // 创建 NV12 数据数组
-    int nv12_size = arg_height * arg_width; // NV12 格式的数据大小
-
-    // 调用 forward 函数并传递处理后的参数
-    int32_t result = forward(self, arg_data_ptr, nv12_size, core_id, priority);
-
-    // 处理 forward 函数的返回值并返回相应的结果
-    if (result == -1) {
-        // 处理 forward 函数执行失败的情况
-        printf("arg_height=%d arg_width=%d, arg_channels=%d\n", arg_height, arg_width, arg_channels);
-        Py_DECREF(arg_array);
+    // 处理 forward 的返回值
+    if (result != 0) {
+        PyErr_SetString(PyExc_RuntimeError, "forward execution failed.");
         Py_RETURN_NONE;
     }
-
-    Py_DECREF(arg_array);
 
     // 返回 forward 函数执行成功的情况
     return model_get_tensor_outputs(self, NULL);
@@ -888,17 +989,50 @@ static int32_t prepare_model_tensor(PyObject *self , Model_Object *model_obj)
     }
 
     for (i = 0; i < model_obj->m_input_count; ++i) {
-        // alloc input tensor
-        hbDNNGetInputTensorProperties(&properties, dnn_handle, i);
-        model_obj->m_inputs[i].properties = properties;
-        hbSysAllocCachedMem(model_obj->m_inputs[i].sysMem,
-            properties.validShape.dimensionSize[0] * ALIGN_16(properties.validShape.dimensionSize[1]) *
-            properties.validShape.dimensionSize[2] * ALIGN_16(properties.validShape.dimensionSize[3]));
-        if (model_obj->m_inputs[i].sysMem == NULL) {
-            // 内存分配失败，释放之前已分配的内存
-            release_model_tensor(model_obj);
-            return -1;
+        HB_CHECK_SUCCESS(
+            hbDNNGetInputTensorProperties(&model_obj->m_inputs[i].properties, dnn_handle, i),
+            "hbDNNGetInputTensorProperties failed");
+
+        int32_t batch = model_obj->m_inputs[i].properties.alignedShape.dimensionSize[0];
+        int32_t batch_size = model_obj->m_inputs[i].properties.alignedByteSize / batch;
+
+        if (model_obj->m_inputs[i].properties.tensorType == HB_DNN_IMG_TYPE_NV12 ||
+            model_obj->m_inputs[i].properties.tensorType == HB_DNN_IMG_TYPE_NV12_SEPARATE) {
+
+            //Adjust tensor properties.
+            model_obj->m_inputs[i].properties.alignedShape = model_obj->m_inputs[i].properties.validShape;
+
+            if (model_obj->m_inputs[i].properties.tensorType == HB_DNN_IMG_TYPE_NV12) {
+                // 分配 NV12 格式的内存
+                // PySys_WriteStdout("Memory allocation start for NV12 input\n");
+                if (hbSysAllocCachedMem(&model_obj->m_inputs[i].sysMem[0], batch_size * batch) != 0) {
+                    PyErr_SetString(PyExc_Exception, "Memory allocation failed for NV12 input");
+                    release_model_tensor(model_obj);
+                    return -1;
+                }
+            } else if (model_obj->m_inputs[i].properties.tensorType == HB_DNN_IMG_TYPE_NV12_SEPARATE) {
+                // 分配 NV12_SEPARATE 格式的内存
+                // PySys_WriteStdout("Memory allocation start for NV12_SEPARATE input\n");
+                if (hbSysAllocCachedMem(&model_obj->m_inputs[i].sysMem[0], batch_size * 2 / 3 * batch) != 0 ||
+                    hbSysAllocCachedMem(&model_obj->m_inputs[i].sysMem[1], batch_size / 3 * batch) != 0) {
+                    PyErr_SetString(PyExc_Exception, "Memory allocation failed for NV12_SEPARATE input");
+                    release_model_tensor(model_obj);
+                    return -1;
+                }
+            }
+        } else {
+            // 处理其他类型张量
+            int32_t input_memSize = model_obj->m_inputs[i].properties.alignedByteSize;
+            if (hbSysAllocCachedMem(&model_obj->m_inputs[i].sysMem[0], input_memSize) != 0) {
+                PyErr_SetString(PyExc_Exception, "Memory allocation failed for input tensor");
+                release_model_tensor(model_obj);
+                return -1;
+            }
+            model_obj->m_inputs[i].properties.alignedShape = model_obj->m_inputs[i].properties.validShape;
         }
+        const char *input_name;
+        HB_CHECK_SUCCESS(hbDNNGetInputName(&input_name, dnn_handle, i),
+                        "hbDNNGetInputName failed");
     }
 
     // 为输出张量数组分配空间
@@ -913,9 +1047,10 @@ static int32_t prepare_model_tensor(PyObject *self , Model_Object *model_obj)
         // alloc output tensor
         hbDNNGetOutputTensorProperties(&properties, dnn_handle, i);
         model_obj->m_outputs[i].properties = properties;
-        hbSysAllocCachedMem(model_obj->m_outputs[i].sysMem, properties.alignedByteSize);
-        if (model_obj->m_outputs[i].sysMem == NULL) {
-            // 内存分配失败，释放之前已分配的内存
+
+        int32_t output_memSize = properties.alignedByteSize;
+        if (hbSysAllocCachedMem(&model_obj->m_outputs[i].sysMem[0], output_memSize) != 0) {
+            PyErr_SetString(PyExc_Exception, "Memory allocation failed for output tensor");
             release_model_tensor(model_obj);
             return -1;
         }

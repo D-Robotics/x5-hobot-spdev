@@ -1,3 +1,17 @@
+// Copyright (c) 2024，D-Robotics.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "vp_sensors.h"
 
 #include <stdio.h>
@@ -939,7 +953,7 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 			j = 0;
 			if(sensor_n > 1)
 			{
-				printf("plase chouse sensor config,the number should small than %d\n",sensor_n);
+				printf("plase choose sensor config,the number should small than %d\n",sensor_n);
 				scanf("%d", &j);
 				if (j >= sensor_n) 
 				{

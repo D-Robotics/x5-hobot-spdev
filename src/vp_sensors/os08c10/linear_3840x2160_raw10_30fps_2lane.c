@@ -1,3 +1,6 @@
+
+
+
 // Copyright (c) 2024，D-Robotics.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,47 +17,50 @@
 
 #include "vp_sensors.h"
 
-#define SENSOR_WIDTH  2592
-#define SENSOR_HEIGHT  1944
-#define SENSOE_FPS 15
-#define RAW10 0x2B
+#define SENSOR_WIDTH  3840
+#define SENSOR_HEIGHT  2160
+#define SENSOE_FPS 30
+#define RAW12 0x2C
 
-static mipi_config_t mipi_config = {
+static mipi_config_t os08c10_mipi_config = {
 	.rx_enable = 1,
 	.rx_attr = {
 		.phy = 0,
 		.lane = 2,
-		.datatype = RAW10,
+		.datatype = RAW12,
 		.fps = SENSOE_FPS,
-		.mclk = 24,
-		.mipiclk = 800,
+		.mclk = 1,
+		.mipiclk = 1701,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 2844,
-		.framelenth = 1968,
-		.settle = 30,
+		.linelenth = 4860,
+		.framelenth = 2314,
+		.settle = 0,
 		.channel_num = 1,
 		.channel_sel = {0},
+		.hsdTime = 0,
+		.hsaTime = 0,
+		.hbpTime = 0,
 	},
 };
 
-static camera_config_t camera_config = {
-	.name = "ov5647",
-	.addr = 0x36,
-	.sensor_mode = NORMAL_M,
+static camera_config_t os08c10_camera_config = {
+	.name = "os08c10",
+	.addr = 0x21,
+	.sensor_mode = 1,
 	.fps = SENSOE_FPS,
-	.format = RAW10,
+	.format = RAW12,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
-	.mipi_cfg = &mipi_config,
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
-	.calib_lname = "/usr/hobot/bin/ov5647_tuning_2592x1944.json",
+	.mipi_cfg = &os08c10_mipi_config,
+	.calib_lname = "disable",
 };
 
-static vin_node_attr_t vin_node_attr = {
+static vin_node_attr_t os08c10_vin_node_attr = {
 	.cim_attr = {
-		.mipi_rx = 2,
+		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
 		.cim_isp_flyby = 1,
@@ -68,32 +74,32 @@ static vin_node_attr_t vin_node_attr = {
 	},
 };
 
-static vin_attr_ex_t ov5647_vin_attr_ex = {
+static vin_attr_ex_t os08c10_vin_attr_ex = {
 	.vin_attr_ex_mask = 0x80,
 	.mclk_ex_attr = {
-		.mclk_freq = 24000000,
+		.mclk_freq = 27000000,
 	},
 };
 
-static vin_ichn_attr_t vin_ichn_attr = {
+static vin_ichn_attr_t os08c10_vin_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
-	.format = RAW10,
+	.format = RAW12,
 };
 
-static vin_ochn_attr_t vin_ochn_attr = {
+static vin_ochn_attr_t os08c10_vin_ochn_attr = {
 	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
-		.format = RAW10,
+		.format = RAW12,
 		// 硬件 stride 跟格式匹配，通过行像素根据raw数据bit位数计算得来
-		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例raw10，1920 x 2 = 3840
+		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例RAW12，1920 x 2 = 3840
 		.wstride = (SENSOR_WIDTH) * 2,
 	},
 };
 
-static isp_attr_t isp_attr = {
-	.input_mode = 0, // 0: online, 1: mcm, 类似offline
+static isp_attr_t os08c10_isp_attr = {
+	.input_mode = 1, // 0: online, 1: mcm, 类似offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -103,30 +109,31 @@ static isp_attr_t isp_attr = {
 	},
 };
 
-static isp_ichn_attr_t isp_ichn_attr = {
+static isp_ichn_attr_t os08c10_isp_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.fmt = FRM_FMT_RAW,
 	.bit_width = 10,
 };
 
-static isp_ochn_attr_t isp_ochn_attr = {
+static isp_ochn_attr_t os08c10_isp_ochn_attr = {
 	.ddr_en = 1,
 	.fmt = FRM_FMT_NV12,
 	.bit_width = 8,
 };
 
-vp_sensor_config_t ov5647_linear_2592x1944_raw10_15fps_2lane = {
+vp_sensor_config_t os08c10_linear_3480x2160_raw12_30fps_2lane = {
 	.chip_id_reg = 0x300A,
-	.chip_id = 0x5647,
-	.sensor_name = "ov5647-2592x1944-15fps",
-	.config_file = "linear_2592x1944_raw10_15fps_2lane.c",
-	.camera_config = &camera_config,
-	.vin_ichn_attr = &vin_ichn_attr,
-	.vin_node_attr = &vin_node_attr,
-	.vin_attr_ex   = &ov5647_vin_attr_ex,
-	.vin_ochn_attr = &vin_ochn_attr,
-	.isp_attr      = &isp_attr,
-	.isp_ichn_attr = &isp_ichn_attr,
-	.isp_ochn_attr = &isp_ochn_attr,
+	.chip_id = 0x53,
+	.sensor_i2c_addr_list = {0x21},
+	.sensor_name = "os08c10-30fps-2lane",
+	.config_file = "linear_3840x2160_raw12_30fps_2lane.c",
+	.camera_config = &os08c10_camera_config,
+	.vin_ichn_attr = &os08c10_vin_ichn_attr,
+	.vin_node_attr = &os08c10_vin_node_attr,
+	.vin_attr_ex   = &os08c10_vin_attr_ex,
+	.vin_ochn_attr = &os08c10_vin_ochn_attr,
+	.isp_attr      = &os08c10_isp_attr,
+	.isp_ichn_attr = &os08c10_isp_ichn_attr,
+	.isp_ochn_attr = &os08c10_isp_ochn_attr,
 };

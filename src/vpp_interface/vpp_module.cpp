@@ -67,7 +67,7 @@ namespace spdev
 				ret = this->SetImageFrame(&frame);
 				if (ret < 0)
 				{
-					LOGE_print("Module %s SetImageFrame failed\n",
+					SC_LOGE("Module %s SetImageFrame failed\n",
 						prev_module->GetModuleTypeString());
 				}
 			}
@@ -85,12 +85,12 @@ namespace spdev
 	{
 		m_run = 1;
 		m_prev_module = prev_module;
-		LOGD_print("BindTo_CHN:%d\n",chn);
+		SC_LOGE("BindTo_CHN:%d\n",chn);
 		if (chn == -1)
 		{
 			m_prev_module_chn = prev_module->GetChnIdForBind(
 				this->GetModuleWidth(), this->GetModuleHeight());
-			LOGD_print("m_prev_module_chn:%d\n",m_prev_module_chn);
+			SC_LOGE("m_prev_module_chn:%d\n",m_prev_module_chn);
 		}
 		else
 		{
@@ -162,7 +162,7 @@ namespace spdev
 		}
 		else
 		{
-			LOGE_print("Module already bind:%d or size:%dx%d not match\n",
+			SC_LOGE("Module already bind:%d or size:%dx%d not match\n",
 				m_is_bind, m_width, m_height);
 			return -1;
 		}
@@ -184,7 +184,7 @@ namespace spdev
 			}
 		}
 		if (pipe_id == -1) {
-			LOGE_print("Module get pipe id failed, max pipeline num: %d!\n", VP_MAX_PIPELINE_NUM);
+			SC_LOGE("Module get pipe id failed, max pipeline num: %d!\n", VP_MAX_PIPELINE_NUM);
 		}
 		return pipe_id;
 	}

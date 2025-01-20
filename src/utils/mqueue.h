@@ -12,22 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/***************************************************************************
- * COPYRIGHT NOTICE
- * Copyright 2020 D-Robotics, Inc.
- * All rights reserved.
- ***************************************************************************/
 #ifndef MQUEUE_H_
 #define MQUEUE_H_
 
 #include <stdint.h>
-#include <pthread.h>
 
-typedef enum {
+typedef enum
+{
     E_QUEUE_OK,
     E_QUEUE_ERROR_FAILED,
     E_QUEUE_ERROR_TIMEOUT,
     E_QUEUE_ERROR_NO_MEM,
+    E_QUEUE_ERROR_FULL,
 } teQueueStatus;
 
 typedef struct
@@ -49,5 +45,6 @@ teQueueStatus mQueueEnqueueEx(tsQueue *psQueue, void *pvData);
 teQueueStatus mQueueDequeue(tsQueue *psQueue, void **ppvData);
 teQueueStatus mQueueDequeueTimed(tsQueue *psQueue, uint32_t u32WaitTimeMil, void **ppvData);
 int mQueueIsFull(tsQueue *psQueue);
+int mQueueIsEmpty(tsQueue *psQueue);
 
 #endif // MQUEUE_H_

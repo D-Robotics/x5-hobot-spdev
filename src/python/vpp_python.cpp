@@ -50,7 +50,7 @@ extern "C"
 
 	static void dump_frame_info(ImageFrame &frame)
 	{
-		LOGI_print("frame_id: %ld, lost_image_num: %ld, image_timestamp: %ld,"
+		SC_LOGE("frame_id: %ld, lost_image_num: %ld, image_timestamp: %ld,"
 			" data_size: %u, exp_time: %ld\n",
 			frame.frame_id, frame.lost_image_num, frame.image_timestamp,
 			frame.data_size[0] + frame.data_size[1], frame.exp_time);
@@ -547,7 +547,7 @@ extern "C"
 
 		if (PyBytes_Size(img_obj) < (self->pframe->stride * self->pframe->height * 3 / 2))
 		{
-			LOGE_print("encode send frame size:%d less than nv12 format size of %dx%d\n",
+			SC_LOGE("encode send frame size:%d less than nv12 format size of %dx%d\n",
 					   PyBytes_Size(img_obj), self->pframe->stride, self->pframe->height);
 			return Py_BuildValue("i", -1);
 		}

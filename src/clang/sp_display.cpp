@@ -113,7 +113,7 @@ static int32_t exec_cmd_ex(const char *cmd, char* res, int32_t max)
 
     FILE *pp = popen(cmd, "r");
     if(!pp) {
-        LOGE_print("[Error] Cannot popen cmd: %s\n", cmd);
+        SC_LOGE("[Error] Cannot popen cmd: %s\n", cmd);
         return -1;
     }
 

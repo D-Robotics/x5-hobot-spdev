@@ -168,7 +168,7 @@ void vp_display_draw_rect(uint8_t *frame, int32_t x0, int32_t y0, int32_t x1, in
 		if (ya < line_width || yi > (screen_height - line_width) ||
 			xi > (screen_width - line_width) ||
 			xa > (screen_width - line_width)) {
-			LOGD_print("========point is 0,return========\n");
+			SC_LOGE("========point is 0,return========\n");
 			return;
 		}
 		for (i = 0; i < line_width; i++) {
@@ -214,7 +214,7 @@ static int32_t osd_draw_cn_word(uint8_t *addr, uint32_t width,
 
 	file = fopen(SDK_FONT_HZK16_FILE, "rb");
 	if (file == NULL) {
-		LOGE_print("open HZK16 file fail %d %s\n", errno, strerror(errno));
+		SC_LOGE("open HZK16 file fail %d %s\n", errno, strerror(errno));
 		return -1;
 	}
 
@@ -225,7 +225,7 @@ static int32_t osd_draw_cn_word(uint8_t *addr, uint32_t width,
 	(void)fseek(file, (int64_t)offset, SEEK_SET);
 	size = fread((void *)buffer, 1, FONT_CN_WORD_BYTES, file);
 	if (size != FONT_CN_WORD_BYTES) {
-		LOGE_print("fread font file:%s error\n", SDK_FONT_HZK16_FILE);
+		SC_LOGE("fread font file:%s error\n", SDK_FONT_HZK16_FILE);
 		(void)fclose(file);
 		return -1;
 	}
@@ -269,7 +269,7 @@ static int32_t osd_draw_en_word(uint8_t *addr, uint32_t width,
 
 	file = fopen(SDK_FONT_ASC16_FILE, "rb");
 	if (file == NULL) {
-		LOGE_print("open ASC16 file fail\n");
+		SC_LOGE("open ASC16 file fail\n");
 		return -1;
 	}
 
@@ -277,7 +277,7 @@ static int32_t osd_draw_en_word(uint8_t *addr, uint32_t width,
 	(void)fseek(file, (int32_t)offset, SEEK_SET);
 	size = fread((void *)buffer, 1, FONT_EN_WORD_BYTES, file);
 	if (size != FONT_EN_WORD_BYTES) {
-		LOGE_print("fread font file:%s error\n", SDK_FONT_ASC16_FILE);
+		SC_LOGE("fread font file:%s error\n", SDK_FONT_ASC16_FILE);
 		(void)fclose(file);
 		return -1;
 	}
@@ -309,7 +309,7 @@ int32_t vp_display_draw_word(uint8_t *addr, int32_t x, int32_t y, char *str, int
 	uint32_t addr_offset;
 
 	if (addr == NULL) {
-		LOGE_print("draw word addr was NULL\n");
+		SC_LOGE("draw word addr was NULL\n");
 		return -1;
 	}
 

@@ -37,6 +37,8 @@
 
 #include "vpp_camera.h"
 
+#define VPP_VSE_OUTBUFFER_COUNT 3
+
 namespace spdev
 {
 	static cJSON *open_json_file(const char *path)
@@ -57,7 +59,7 @@ namespace spdev
 		ret = fread(buf, fsize, 1, fp);
 		if (ret != 1)
 		{
-			LOGE_print("Error fread size:%d\n", ret);
+			SC_LOGE("Error fread size:%d\n", ret);
 		}
 		fclose(fp);
 
@@ -69,7 +71,7 @@ namespace spdev
 			const char *error_ptr = cJSON_GetErrorPtr();
 			if (error_ptr != NULL)
 			{
-				LOGE_print("Error cJSON_Parse: %s\n", error_ptr);
+				SC_LOGE("Error cJSON_Parse: %s\n", error_ptr);
 			}
 			free(buf);
 			return NULL;
@@ -275,6 +277,8 @@ namespace spdev
 		vse_config->vse_ichn_attr.fmt = FRM_FMT_NV12;
 		vse_config->vse_ichn_attr.bit_width = 8;
 
+		vse_config->vse_ochn_buffer_count = VPP_VSE_OUTBUFFER_COUNT;
+
 		// 设置VSE通道0输出属性
 		for (i = 0; i < chn_num; i++) {
 			if ((width[i] == 0) && (height[i] == 0)) {//如果高宽为0，那么就开一个和原始高宽一致的通道
@@ -283,7 +287,7 @@ namespace spdev
 			}
 			vse_chn = SelectVseChn(&vse_chn_en, input_width, input_height, width[i], height[i]);
 			if (vse_chn < 0) {
-				LOGE_print("Invalid size:%dx%d\n", width[i], height[i]);
+				SC_LOGE("Invalid size:%dx%d\n", width[i], height[i]);
 				return -1;
 			}
 			vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
@@ -357,7 +361,7 @@ namespace spdev
 
 			vse_chn = SelectVseChn(&vse_chn_en, src_width, src_height, dst_width[i], dst_height[i]);
 			if (vse_chn < 0) {
-				LOGE_print("Invalid size:%dx%d\n", dst_width[i], dst_height[i]);
+				SC_LOGE("Invalid size:%dx%d\n", dst_width[i], dst_height[i]);
 				return -1;
 			}
 			if (proc_mode >= VPS_SCALE) {
@@ -410,6 +414,10 @@ namespace spdev
 			SC_LOGE("CamInitParam failed error(%d)", ret);
 			return -1;
 		}
+
+		vp_vflow_contex->vin_info.ochn_buffer_count = 3;
+		vp_vflow_contex->isp_info.ochn_buffer_count = 3;
+		vp_vflow_contex->gdc_info.output_buffer_count = 3;
 
 		ret = vp_vin_init(vp_vflow_contex);
 		ret |= vp_isp_init(vp_vflow_contex);
@@ -561,12 +569,12 @@ namespace spdev
 			if (chn >= 0) {
 				ret = vp_vse_get_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
 			} else {
-				LOGE_print("get chn from %dx%d failed", width, height);
+				SC_LOGE("get chn from %dx%d failed", width, height);
 				return -1;
 			}
 			break;
 		default:
-			LOGE_print("Error: module not supported!\n");
+			SC_LOGE("Error: module not supported!\n");
 			return -1;
 		}
 
@@ -601,12 +609,12 @@ namespace spdev
 			if (chn >= 0) {
 				vp_vse_release_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
 			} else {
-				LOGE_print("get chn from %dx%d failed", width, height);
+				SC_LOGE("get chn from %dx%d failed", width, height);
 				return;
 			}
 			break;
 		default:
-			LOGE_print("Error: module not supported!\n");
+			SC_LOGE("Error: module not supported!\n");
 		}
 	}
 

@@ -60,7 +60,7 @@ namespace spdev
 			m_pipe_id = GetPipeId(&s_pipe_mask);
 			if (m_pipe_id < 0)
 			{
-				LOGE_print("Encode get pipe id error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode get pipe id error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_reset_inited;
 			}
@@ -69,13 +69,13 @@ namespace spdev
 			m_height = height;
 			m_bit_rate = bit_rate;
 
-			LOGD_print("pipe:%d type:%d %dx%d bit_rate:%d begin init\n",
+			SC_LOGE("pipe:%d type:%d %dx%d bit_rate:%d begin init\n",
 				m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 
 			ret = vp_encode_config_param(&m_context, m_type, m_width, m_height, 30, m_bit_rate);
 			if (ret != 0)
 			{
-				LOGE_print("Encode config param error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode config param error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_put_pipe_id;
 			}
@@ -83,7 +83,7 @@ namespace spdev
 			ret = vp_codec_init(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_put_pipe_id;
 			}
@@ -91,14 +91,14 @@ namespace spdev
 			ret = vp_codec_start(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_deinit;
 			}
 		}
 		else
 		{
-			LOGW_print("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+			SC_LOGE("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 		}
 
@@ -122,7 +122,7 @@ namespace spdev
 			m_pipe_id = GetPipeId(&s_pipe_mask);
 			if (m_pipe_id < 0)
 			{
-				LOGE_print("Encode get pipe id error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode get pipe id error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_reset_inited;
 			}
@@ -130,7 +130,7 @@ namespace spdev
 			ret = vp_encode_config_param(&m_context, m_type, m_pipe_id, m_width, m_height, m_bit_rate);
 			if (ret != 0)
 			{
-				LOGE_print("Encode config param error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode config param error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_put_pipe_id;
 			}
@@ -138,7 +138,7 @@ namespace spdev
 			ret = vp_codec_init(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_put_pipe_id;
 			}
@@ -146,14 +146,14 @@ namespace spdev
 			ret = vp_codec_start(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+				SC_LOGE("Encode init error, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 				goto exit_deinit;
 			}
 		}
 		else
 		{
-			LOGW_print("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+			SC_LOGE("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 		}
 
@@ -175,7 +175,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Encoder was not inited!\n");
+			SC_LOGE("Encoder was not inited!\n");
 			m_inited.clear();
 			return -1;
 		}
@@ -194,7 +194,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Encoder channel dose not created!\n");
+			SC_LOGE("Encoder channel dose not created!\n");
 			m_inited.clear();
 			return -1;
 		}
@@ -210,7 +210,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Encoder channel dose not created!\n");
+			SC_LOGE("Encoder channel dose not created!\n");
 			m_inited.clear();
 			return -1;
 		}
@@ -224,7 +224,7 @@ namespace spdev
 	{
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Encoder channel dose not created!\n");
+			SC_LOGE("Encoder channel dose not created!\n");
 			m_inited.clear();
 			return;
 		}
@@ -243,7 +243,7 @@ namespace spdev
 			m_pipe_id = GetPipeId(&s_pipe_mask);
 			if (m_pipe_id < 0)
 			{
-				LOGE_print("Decode get pipe id error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode get pipe id error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_reset_inited;
 			}
@@ -254,21 +254,21 @@ namespace spdev
 			ret = vp_decode_config_param(&m_context, m_type, m_width, m_height);
 			if (ret != 0)
 			{
-				LOGE_print("Decode config param error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode config param error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_put_pipe_id;
 			}
 			ret = vp_codec_init(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Decode init error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode init error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_put_pipe_id;
 			}
 			ret = vp_codec_start(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Decode start error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode start error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_deinit;
 			}
@@ -288,7 +288,7 @@ namespace spdev
 		}
 		else
 		{
-			LOGW_print("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
+			SC_LOGE("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 		}
 
@@ -313,7 +313,7 @@ namespace spdev
 			m_pipe_id = GetPipeId(&s_pipe_mask);
 			if (m_pipe_id < 0)
 			{
-				LOGE_print("Decode get pipe id error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode get pipe id error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_reset_inited;
 			}
@@ -321,28 +321,28 @@ namespace spdev
 			ret = vp_decode_config_param(&m_context, m_type, m_width, m_height);
 			if (ret != 0)
 			{
-				LOGE_print("Decode config param error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode config param error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_put_pipe_id;
 			}
 			ret = vp_codec_init(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Decode init error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode init error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_put_pipe_id;
 			}
 			ret = vp_codec_start(&m_context);
 			if (ret != 0)
 			{
-				LOGE_print("Decode start error, pipe_id:%d type:%d width:%d h:%d\n",
+				SC_LOGE("Decode start error, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 				goto exit_deinit;
 			}
 		}
 		else
 		{
-			LOGW_print("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
+			SC_LOGE("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 		}
 
@@ -362,7 +362,7 @@ namespace spdev
 	{
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Decoder channel dose not created!\n");
+			SC_LOGE("Decoder channel dose not created!\n");
 			m_inited.clear();
 			return -1;
 		}
@@ -394,7 +394,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Decoder channel dose not created!\n");
+			SC_LOGE("Decoder channel dose not created!\n");
 			m_inited.clear();
 			return 0;
 		}
@@ -410,7 +410,7 @@ namespace spdev
 	{
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Decoder channel dose not created!\n");
+			SC_LOGE("Decoder channel dose not created!\n");
 			m_inited.clear();
 			return;
 		}
@@ -424,7 +424,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Decoder channel dose not created!\n");
+			SC_LOGE("Decoder channel dose not created!\n");
 			m_inited.clear();
 			return -1;
 		}
@@ -440,7 +440,7 @@ namespace spdev
 
 		if (!m_inited.test_and_set())
 		{
-			LOGE_print("Decoder channel dose not created!\n");
+			SC_LOGE("Decoder channel dose not created!\n");
 			m_inited.clear();
 			return -1;
 		}

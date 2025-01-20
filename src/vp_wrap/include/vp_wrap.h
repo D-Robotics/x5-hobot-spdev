@@ -30,7 +30,6 @@
 #include "vp_isp.h"
 #include "vp_vse.h"
 #include "vp_osd.h"
-#include "vp_sensors.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +38,7 @@ extern "C" {
 void vp_print_debug_infos(void);
 
 void vp_normal_buf_info_print(ImageFrame *frame);
+void vp_print_debug_infos_when_error(void);
 
 int32_t vp_dump_nv12_to_file(char *filename, uint8_t *data_y, uint8_t *data_uv,
 		int width, int height);
@@ -49,7 +49,6 @@ int32_t vp_dump_2plane_yuv_to_file(char *filename, uint8_t *src_buffer, uint8_t 
 		uint32_t size, uint32_t size1);
 
 void vp_vin_print_hbn_vnode_image_t(const hbn_vnode_image_t *frame);
-void vp_codec_print_media_codec_output_buffer_info(ImageFrame *frame);
 void fill_image_frame_from_vnode_image(ImageFrame *frame);
 void fill_vnode_image_from_image_frame(ImageFrame *frame);
 

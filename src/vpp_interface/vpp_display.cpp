@@ -432,29 +432,29 @@ int32_t VPPDisplay::SetImageFrame(ImageFrame *frame) {
 		ret = n2d_open();
 		if(ret)
 		{
-			LOGE_print("n2d_open fail,ret:%d\n",ret);
+			SC_LOGE("n2d_open fail,ret:%d\n",ret);
 		}
 
 		for (size_t i = 0; i < 3; i++)
 		{
 			ret = convertN2DBuffer(&primary_mapped_gpu_buffer[i],&m_vo_buffers[i].buffer, N2D_NV12);
 			if(ret){
-				LOGE_print("convertN2DBuffer(NV12) fail,ret:%d\n",ret);
+				SC_LOGE("convertN2DBuffer(NV12) fail,ret:%d\n",ret);
 			}
 		}
 
 		ret = convertN2DBuffer(&overlay_mapped_gpu_buffer[0],&m_draw_buffers.buffer, N2D_RGBA8888);
 		if(ret){
-			LOGE_print("convertN2DBuffer(AR24) fail,ret:%d\n",ret);
+			SC_LOGE("convertN2DBuffer(AR24) fail,ret:%d\n",ret);
 		}
 
 		ret = convertN2DBuffer(&final_mapped_gpu_buffer[0],&m_final_buffers[0].buffer, N2D_NV12);
 		if(ret){
-			LOGE_print("convertN2DBuffer(NV12 final) fail,ret:%d\n",ret);
+			SC_LOGE("convertN2DBuffer(NV12 final) fail,ret:%d\n",ret);
 		}
 		ret = convertN2DBuffer(&final_mapped_gpu_buffer[1],&m_final_buffers[1].buffer, N2D_NV12);
 		if(ret){
-			LOGE_print("convertN2DBuffer(NV12 final) fail,ret:%d\n",ret);
+			SC_LOGE("convertN2DBuffer(NV12 final) fail,ret:%d\n",ret);
 		}
 		memset(&rgba_buffer,0,sizeof(n2d_buffer_t));
 		n2d_util_allocate_buffer(
@@ -466,7 +466,7 @@ int32_t VPPDisplay::SetImageFrame(ImageFrame *frame) {
         N2D_TSC_DISABLE,
         &rgba_buffer);
 
-		LOGI_print("N2D init done!\n");
+		SC_LOGE("N2D init done!\n");
 		isGPUInit = true;
 	}
 
@@ -544,14 +544,14 @@ int32_t VPPDisplay::SetGraphWord(int32_t x, int32_t y, char *str,
 	int32_t ret = 0;
 	int32_t len;
 	if (str == NULL) {
-		LOGE_print("string was NULL\n");
+		SC_LOGE("string was NULL\n");
 		return -1;
 	}
 
 	if (0 == m_display_mode) {
 		if ((x < 0) || (x > m_width) || (y < 0) || (y > m_height) ||
 			((line_width * FONT_ONE_ENCODE_WIDTH + y) > m_height)) {
-			LOGE_print("parameter error, coordinate (%d, %d) string:%s line_width:%d\n",
+			SC_LOGE("parameter error, coordinate (%d, %d) string:%s line_width:%d\n",
 				x, y, str, line_width);
 			return -1;
 		}

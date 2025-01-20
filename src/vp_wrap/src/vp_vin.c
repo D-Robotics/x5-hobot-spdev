@@ -43,8 +43,7 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 	// 调整 mipi_rx 的 index
 	vin_node_attr->cim_attr.mipi_rx = vp_vflow_contex->mipi_csi_rx_index;
 	uint32_t hw_id = vin_node_attr->cim_attr.mipi_rx;
-	uint32_t ichn_id = 0;
-	uint32_t ochn_id = 0;
+	uint32_t chn_id = 0;
 	uint64_t vin_attr_ex_mask = 0;
 	hbn_vnode_handle_t *vin_node_handle = &vp_vflow_contex->vin_node_handle;
 	vin_attr_ex_t vin_attr_ex;
@@ -56,8 +55,9 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 		SC_LOGI("csi%d ignore mclk ex attr, because mclk is not configed at device tree.",
 			vp_vflow_contex->mipi_csi_rx_index);
 	}else{
-		vin_attr_ex.mclk_ex_attr.mclk_freq = 24000000; // 24MHz
-		vin_attr_ex.vin_attr_ex_mask = 0x80;
+		vin_attr_ex.vin_attr_ex_mask = sensor_config->vin_attr_ex->vin_attr_ex_mask;
+		vin_attr_ex.mclk_ex_attr.mclk_freq = sensor_config->vin_attr_ex->mclk_ex_attr.mclk_freq;
+		vin_attr_ex_mask = vin_attr_ex.vin_attr_ex_mask;
 	}
 
 	// 创建pipeline中的vin node
@@ -69,14 +69,13 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 	ret = hbn_vnode_set_attr(*vin_node_handle, vin_node_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_attr");
 	// 设置输入通道的属性
-	ret = hbn_vnode_set_ichn_attr(*vin_node_handle, ichn_id, vin_ichn_attr);
+	ret = hbn_vnode_set_ichn_attr(*vin_node_handle, chn_id, vin_ichn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ichn_attr");
 	// 设置输出通道的属性
 	// 使能DDR输出
 	vin_ochn_attr->ddr_en = 1;
-	ret = hbn_vnode_set_ochn_attr(*vin_node_handle, ochn_id, vin_ochn_attr);
+	ret = hbn_vnode_set_ochn_attr(*vin_node_handle, chn_id, vin_ochn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_attr");
-	vin_attr_ex_mask = vin_attr_ex.vin_attr_ex_mask;
 	if (vin_attr_ex_mask) {
 		for (uint8_t i = 0; i < VIN_ATTR_EX_INVALID; i ++) {
 			if ((vin_attr_ex_mask & (1 << i)) == 0)
@@ -88,14 +87,14 @@ int32_t vp_vin_init(vp_vflow_contex_t *vp_vflow_contex)
 			SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_attr_ex");
 		}
 	}
-	alloc_attr.buffers_num = 3;
+	alloc_attr.buffers_num = vp_vflow_contex->vin_info.ochn_buffer_count;
 	alloc_attr.is_contig = 1;
 	alloc_attr.flags = HB_MEM_USAGE_CPU_READ_OFTEN
 						| HB_MEM_USAGE_CPU_WRITE_OFTEN
 						| HB_MEM_USAGE_CACHED
 						| HB_MEM_USAGE_HW_CIM
 						| HB_MEM_USAGE_GRAPHIC_CONTIGUOUS_BUF;
-	ret = hbn_vnode_set_ochn_buf_attr(*vin_node_handle, ochn_id, &alloc_attr);
+	ret = hbn_vnode_set_ochn_buf_attr(*vin_node_handle, chn_id, &alloc_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_buf_attr");
 	SC_LOGD("successful");
 	return 0;

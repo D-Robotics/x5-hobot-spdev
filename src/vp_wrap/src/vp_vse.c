@@ -29,6 +29,7 @@
 
 #include "vp_wrap.h"
 #include "vp_vse.h"
+#define VSE_MAX_CHANNLE 6 //max is 6
 
 int32_t vp_vse_init(vp_vflow_contex_t *vp_vflow_contex)
 {
@@ -48,19 +49,22 @@ int32_t vp_vse_init(vp_vflow_contex_t *vp_vflow_contex)
 	ret = hbn_vnode_set_attr(*vse_node_handle, &vse_config->vse_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_attr");
 
-	SC_LOGD("VSE: input_width: %d input_height: %d",
-			vse_config->vse_ichn_attr.width, vse_config->vse_ichn_attr.height);
 	ret = hbn_vnode_set_ichn_attr(*vse_node_handle, ichn_id, &vse_config->vse_ichn_attr);
 	SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ichn_attr");
 
-	alloc_attr.buffers_num = 3;
+	if(vse_config->vse_ochn_buffer_count > 0){
+		alloc_attr.buffers_num = vse_config->vse_ochn_buffer_count;
+	}else{
+		alloc_attr.buffers_num = 3;
+	}
+
 	alloc_attr.is_contig = 1;
 	alloc_attr.flags = HB_MEM_USAGE_CPU_READ_OFTEN
 						| HB_MEM_USAGE_CPU_WRITE_OFTEN
 						| HB_MEM_USAGE_CACHED
 						| HB_MEM_USAGE_GRAPHIC_CONTIGUOUS_BUF;
 
-	for (i = 0; i < VSE_MAX_CHN_NUM; i++) {
+	for (i = 0; i < VSE_MAX_CHANNLE; i++) {
 		if (vse_config->vse_ochn_attr[i].chn_en) {
 			ret = hbn_vnode_set_ochn_attr(*vse_node_handle, i, &vse_config->vse_ochn_attr[i]);
 			SC_ERR_CON_EQ(ret, 0, "hbn_vnode_set_ochn_attr");
@@ -125,5 +129,20 @@ int32_t vp_vse_release_frame(vp_vflow_contex_t *vp_vflow_contex,
 	hbn_vnode_handle_t vse_node_handle = vp_vflow_contex->vse_node_handle;
 
 	ret = hbn_vnode_releaseframe(vse_node_handle, ochn_id, image_frame);
+	return ret;
+}
+
+int32_t vp_vse_get_output_info(vp_vflow_contex_t *vp_vflow_contex,
+	int32_t ochn_id, vp_vse_output_info_t *vse_out_info)
+{
+	int ret = 0;
+	vse_ochn_attr_t vse_ochn_attr = {0};
+	hbn_vnode_handle_t vse_node_handle = vp_vflow_contex->vse_node_handle;
+	ret = hbn_vnode_get_ochn_attr(vse_node_handle, ochn_id, &vse_ochn_attr);
+	if(ret == 0){
+		vse_out_info->fps = vse_ochn_attr.fps.dst;
+		vse_out_info->width = vse_ochn_attr.target_w;
+		vse_out_info->height = vse_ochn_attr.target_h;
+	}
 	return ret;
 }

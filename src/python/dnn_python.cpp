@@ -754,6 +754,14 @@ static int32_t forward(
         // // 调试再打开
         // PySys_WriteStdout("Processing input tensor, index = %zu, data_size = %d, tensor_type = %d\n", idx, data_size , tensor_type);
 
+        // X5 上需要对 HB_DNN_IMG_TYPE_RGB 的输入数据遍历所有输入数据手动做-128处理
+        if (tensor_type == HB_DNN_IMG_TYPE_RGB) {
+            // 遍历所有输入数据并手动减去 128，同时限制结果在 0-255 范围内
+            for (int32_t i = 0; i < data_size; ++i) {
+                int32_t value = static_cast<int32_t>(data_ptr[i]) - 128;
+                data_ptr[i] = static_cast<unsigned char>(std::max(0, std::min(255, value)));
+            }
+        }
         // 根据 tensor 类型拷贝数据到系统内存
         if (tensor_type == HB_DNN_IMG_TYPE_NV12_SEPARATE) {
             if (!input_tensor->sysMem[1].virAddr) {

@@ -466,7 +466,7 @@ int32_t VPPDisplay::SetImageFrame(ImageFrame *frame) {
         N2D_TSC_DISABLE,
         &rgba_buffer);
 
-		SC_LOGE("N2D init done!\n");
+		SC_LOGI("N2D init done!\n");
 		isGPUInit = true;
 	}
 

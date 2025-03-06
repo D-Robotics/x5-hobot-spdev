@@ -69,7 +69,7 @@ namespace spdev
 			m_height = height;
 			m_bit_rate = bit_rate;
 
-			SC_LOGE("pipe:%d type:%d %dx%d bit_rate:%d begin init\n",
+			SC_LOGI("pipe:%d type:%d %dx%d bit_rate:%d begin init\n",
 				m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 
 			ret = vp_encode_config_param(&m_context, m_type, m_width, m_height, 30, m_bit_rate);
@@ -98,7 +98,7 @@ namespace spdev
 		}
 		else
 		{
-			SC_LOGE("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+			SC_LOGI("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 		}
 
@@ -153,7 +153,7 @@ namespace spdev
 		}
 		else
 		{
-			SC_LOGE("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
+			SC_LOGI("Encode init already, pipe_id:%d type:%d width:%d h:%d bit_rate:%d\n",
 					m_pipe_id, m_type, m_width, m_height, m_bit_rate);
 		}
 
@@ -288,7 +288,7 @@ namespace spdev
 		}
 		else
 		{
-			SC_LOGE("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
+			SC_LOGI("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 		}
 
@@ -342,7 +342,7 @@ namespace spdev
 		}
 		else
 		{
-			SC_LOGE("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
+			SC_LOGI("Decode already init, pipe_id:%d type:%d width:%d h:%d\n",
 					m_pipe_id, m_type, m_width, m_height);
 		}
 

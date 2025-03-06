@@ -58,8 +58,11 @@ class VPPCamera :public VPPModule
 	VPPCamera() {
 	  SetModuleType(VPP_CAMERA);
 	  SetModuleTypeString((char *)"Camera");
+	  useV4l2 = false;
 	};
 	virtual ~VPPCamera() = default;
+
+	bool useV4l2;
 
 	/**
 	 * @brief 指定原始分辨率并打开摄像头，适用于有多种分辨率的摄像头

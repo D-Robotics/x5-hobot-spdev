@@ -522,7 +522,7 @@ extern "C"
 		VPPEncode *pobj = static_cast<VPPEncode *>(self->pobj);
 
 			return Py_BuildValue("i", pobj->OpenEncode(type, width, height, bits));
-		}
+	}
 
 	static PyObject *Encoder_send_frame(libsppydev_Object *self, PyObject *args, PyObject *kw)
 	{

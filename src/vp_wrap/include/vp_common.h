@@ -72,11 +72,11 @@ typedef enum VSE_CHANNEL_S {
 
 #define VP_GET_MD_CODEC_TYPE(v) \
 	({ \
-		int _v = (v); \
+		int32_t _v = (v); \
 		( \
-			_v == 0 ? MEDIA_CODEC_ID_H264 : \
-			_v == 1 ? MEDIA_CODEC_ID_H265 : \
-			_v == 2 ? MEDIA_CODEC_ID_MJPEG : \
+			_v == 1 ? MEDIA_CODEC_ID_H264 : \
+			_v == 2 ? MEDIA_CODEC_ID_H265 : \
+			_v == 3 ? MEDIA_CODEC_ID_MJPEG : \
 			MEDIA_CODEC_ID_NONE \
 		); \
 	})

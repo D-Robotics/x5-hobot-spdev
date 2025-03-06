@@ -168,7 +168,7 @@ void vp_display_draw_rect(uint8_t *frame, int32_t x0, int32_t y0, int32_t x1, in
 		if (ya < line_width || yi > (screen_height - line_width) ||
 			xi > (screen_width - line_width) ||
 			xa > (screen_width - line_width)) {
-			SC_LOGE("========point is 0,return========\n");
+			//SC_LOGE("========point is 0,return========\n");
 			return;
 		}
 		for (i = 0; i < line_width; i++) {

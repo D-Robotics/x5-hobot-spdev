@@ -85,12 +85,12 @@ namespace spdev
 	{
 		m_run = 1;
 		m_prev_module = prev_module;
-		SC_LOGE("BindTo_CHN:%d\n",chn);
+		SC_LOGI("BindTo_CHN:%d\n",chn);
 		if (chn == -1)
 		{
 			m_prev_module_chn = prev_module->GetChnIdForBind(
 				this->GetModuleWidth(), this->GetModuleHeight());
-			SC_LOGE("m_prev_module_chn:%d\n",m_prev_module_chn);
+				SC_LOGI("m_prev_module_chn:%d\n",m_prev_module_chn);
 		}
 		else
 		{

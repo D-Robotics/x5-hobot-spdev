@@ -34,6 +34,7 @@
 #include "vp_isp.h"
 #include "vp_vse.h"
 #include "vp_wrap.h"
+#include "vp_v4l2.h"
 
 #include "vpp_camera.h"
 
@@ -399,6 +400,18 @@ namespace spdev
 
 		return ret;
 	}
+
+	bool V4l2Loaded() {
+		std::ifstream modules("/proc/modules");
+		std::string line;
+		while (std::getline(modules, line)) {
+			if (line.find("vs_sif_v4l") != std::string::npos) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	int32_t VPPCamera::OpenCamera(const int pipe_id,
 								  const int32_t video_index,
 								  int32_t chn_num,
@@ -406,39 +419,89 @@ namespace spdev
 								  vp_sensors_parameters *parameters)
 	{
 		int32_t ret = 0;
-		vp_vflow_contex_t *vp_vflow_contex = &m_vp_vflow_context;
-		// TODO: 根据 video_index 和 chn_num 完成sensor的探测、初始化、开流
-		ret = CamInitParam(vp_vflow_contex, pipe_id, video_index, chn_num,
-			width, height, parameters);
-		if (ret != 0){
-			SC_LOGE("CamInitParam failed error(%d)", ret);
-			return -1;
+
+		if (V4l2Loaded()) {
+			useV4l2 = true;
+			SC_LOGI("v4l2 module");
+		} else {
+			useV4l2 = false;
+			SC_LOGI("hbn module");
 		}
 
-		vp_vflow_contex->vin_info.ochn_buffer_count = 3;
-		vp_vflow_contex->isp_info.ochn_buffer_count = 3;
-		vp_vflow_contex->gdc_info.output_buffer_count = 3;
+		if(useV4l2)
+		{
+			int mipi_host = 0;
+			board_camera_info_t camera_info[MAX_CAMERAS];
 
-		ret = vp_vin_init(vp_vflow_contex);
-		ret |= vp_isp_init(vp_vflow_contex);
-		ret |= vp_vse_init(vp_vflow_contex);
-		ret |= vp_vflow_init(vp_vflow_contex);
-		if (ret != 0){
-			SC_LOGE("pipeline init failed error(%d)", ret);
-			return -1;
+			memset(camera_info, 0, sizeof(camera_info));
+			ret = parse_config("/etc/board_config.json", camera_info);
+			if (ret != 0) {
+				printf("Failed to parse cameras\n");
+				return -1;
+			}
+
+			for (int i = 0; i < MAX_CAMERAS; i++) {
+				printf("Camera %d:\n", i);
+				printf("\tenable: %d\n", camera_info[i].enable);
+				printf("\ti2c_bus: %d\n", camera_info[i].i2c_bus);
+				printf("\tmipi_host: %d\n", camera_info[i].mipi_host);
+			}
+
+			if(video_index == -1)
+			{
+				mipi_host = 0;
+			}
+			else if(video_index > 0 && video_index < MAX_CAMERAS)
+			{
+				if(camera_info[video_index].enable == 0)
+				{
+					SC_LOGE("video_index error(%d)");
+					return -1;
+				}
+				mipi_host = camera_info[video_index].mipi_host;
+			}
+
+			ret = vp_v4l2_init(mipi_host, parameters->raw_width, parameters->raw_height, chn_num, width, height);
+			if (ret != 0){
+				SC_LOGE("vp_v4l2_init failed error(%d)", ret);
+				return -1;
+			}
 		}
+		else
+		{
+			vp_vflow_contex_t *vp_vflow_contex = &m_vp_vflow_context;
+			// TODO: 根据 video_index 和 chn_num 完成sensor的探测、初始化、开流
+			ret = CamInitParam(vp_vflow_contex, pipe_id, video_index, chn_num,
+				width, height, parameters);
+			if (ret != 0){
+				SC_LOGE("CamInitParam failed error(%d)", ret);
+				return -1;
+			}
 
-		ret = vp_vin_start(vp_vflow_contex);
-		ret |= vp_isp_start(vp_vflow_contex);
-		ret |= vp_vse_start(vp_vflow_contex);
-		ret |= vp_vflow_start(vp_vflow_contex);
-		if (ret != 0){
-			SC_LOGE("pipeline start failed error(%d)", ret);
-			return -1;
+			vp_vflow_contex->vin_info.ochn_buffer_count = 3;
+			vp_vflow_contex->isp_info.ochn_buffer_count = 3;
+			vp_vflow_contex->gdc_info.output_buffer_count = 3;
+
+			ret = vp_vin_init(vp_vflow_contex);
+			ret |= vp_isp_init(vp_vflow_contex);
+			ret |= vp_vse_init(vp_vflow_contex);
+			ret |= vp_vflow_init(vp_vflow_contex);
+			if (ret != 0){
+				SC_LOGE("pipeline init failed error(%d)", ret);
+				return -1;
+			}
+
+			ret = vp_vin_start(vp_vflow_contex);
+			ret |= vp_isp_start(vp_vflow_contex);
+			ret |= vp_vse_start(vp_vflow_contex);
+			ret |= vp_vflow_start(vp_vflow_contex);
+			if (ret != 0){
+				SC_LOGE("pipeline start failed error(%d)", ret);
+				return -1;
+			}
+
+			vp_print_debug_infos();
 		}
-
-		vp_print_debug_infos();
-
 		return ret;
 	}
 
@@ -511,27 +574,40 @@ namespace spdev
 	int32_t VPPCamera::Close(void)
 	{
 		int32_t ret = 0;
-		vp_vflow_contex_t *vp_vflow_contex = &m_vp_vflow_context;
-		ret = vp_vflow_stop(vp_vflow_contex);
-		if (m_only_vse == false) {
-			ret |= vp_vin_stop(vp_vflow_contex);
-			ret |= vp_isp_stop(vp_vflow_contex);
+
+		if(useV4l2)
+		{
+			ret = vp_v4l2_deinit();
+			if (ret != 0){
+				SC_LOGE("vp_v4l2_deinit failed error(%d)", ret);
+				return -1;
+			}
 		}
-		ret |= vp_vse_stop(vp_vflow_contex);
-		if (ret != 0){
-			SC_LOGE("pipeline stop failed error(%d)", ret);
-			return -1;
+		else
+		{
+			vp_vflow_contex_t *vp_vflow_contex = &m_vp_vflow_context;
+			ret = vp_vflow_stop(vp_vflow_contex);
+			if (m_only_vse == false) {
+				ret |= vp_vin_stop(vp_vflow_contex);
+				ret |= vp_isp_stop(vp_vflow_contex);
+			}
+			ret |= vp_vse_stop(vp_vflow_contex);
+			if (ret != 0){
+				SC_LOGE("pipeline stop failed error(%d)", ret);
+				return -1;
+			}
+			ret = vp_vflow_deinit(vp_vflow_contex);
+			ret |= vp_vse_deinit(vp_vflow_contex);
+			if (m_only_vse == false) {
+				ret |= vp_isp_deinit(vp_vflow_contex);
+				ret |= vp_vin_deinit(vp_vflow_contex);
+			}
+			if (ret != 0){
+				SC_LOGE("pipeline deinit failed error(%d)", ret);
+				return -1;
+			}
 		}
-		ret = vp_vflow_deinit(vp_vflow_contex);
-		ret |= vp_vse_deinit(vp_vflow_contex);
-		if (m_only_vse == false) {
-			ret |= vp_isp_deinit(vp_vflow_contex);
-			ret |= vp_vin_deinit(vp_vflow_contex);
-		}
-		if (ret != 0){
-			SC_LOGE("pipeline deinit failed error(%d)", ret);
-			return -1;
-		}
+
 		return 0;
 	}
 
@@ -539,11 +615,23 @@ namespace spdev
 	{
 		int32_t ret = 0;
 
-		ret = vp_vse_get_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
-		if (ret)
+		if(useV4l2)
 		{
-			return -1;
+			ret = vp_v4l2_get_vse_frame(chn, &frame->vnode_image);
+			if (ret != 0){
+				SC_LOGE("vp_v4l2_get_vse_frame failed error(%d)", ret);
+				return -1;
+			}
 		}
+		else
+		{
+			ret = vp_vse_get_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
+			if (ret)
+			{
+				return -1;
+			}
+		}
+
 		fill_image_frame_from_vnode_image(frame);
 
 		return ret;
@@ -559,15 +647,24 @@ namespace spdev
 		switch (module)
 		{
 		case SP_DEV_RAW:
-			ret = vp_vin_get_frame(&m_vp_vflow_context, &(frame->vnode_image));
+			if(useV4l2)
+				ret = vp_v4l2_get_sif_frame(&frame->vnode_image);
+			else
+				ret = vp_vin_get_frame(&m_vp_vflow_context, &(frame->vnode_image));
 			break;
 		case SP_DEV_ISP:
-			ret = vp_isp_get_frame(&m_vp_vflow_context, &frame->vnode_image);
+			if(useV4l2)
+				ret = vp_v4l2_get_isp_frame(&frame->vnode_image);
+			else
+				ret = vp_isp_get_frame(&m_vp_vflow_context, &frame->vnode_image);
 			break;
 		case SP_DEV_VSE:
 			chn = GetChnId(width, height);
 			if (chn >= 0) {
-				ret = vp_vse_get_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
+				if(useV4l2)
+					ret = vp_v4l2_get_vse_frame(chn, &frame->vnode_image);
+				else
+					ret = vp_vse_get_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
 			} else {
 				SC_LOGE("get chn from %dx%d failed", width, height);
 				return -1;
@@ -587,7 +684,12 @@ namespace spdev
 
 	void VPPCamera::ReturnImageFrame(ImageFrame *frame, int32_t chn)
 	{
-		vp_vse_release_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
+		if(useV4l2)
+		{
+			vp_v4l2_release_frame(&frame->vnode_image);
+		}
+		else
+			vp_vse_release_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
 		return;
 	}
 
@@ -595,26 +697,32 @@ namespace spdev
 									 int32_t width, int32_t height)
 	{
 		int32_t chn = 0;
-
-		switch (module)
+		if(useV4l2)
 		{
-		case SP_DEV_RAW:
-			vp_vin_release_frame(&m_vp_vflow_context, &frame->vnode_image);
-			break;
-		case SP_DEV_ISP:
-			vp_isp_release_frame(&m_vp_vflow_context, &frame->vnode_image);
-			break;
-		case SP_DEV_VSE:
-			chn = GetChnId(width, height);
-			if (chn >= 0) {
-				vp_vse_release_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
-			} else {
-				SC_LOGE("get chn from %dx%d failed", width, height);
-				return;
+			vp_v4l2_release_frame(&frame->vnode_image);
+		}
+		else
+		{
+			switch (module)
+			{
+			case SP_DEV_RAW:
+				vp_vin_release_frame(&m_vp_vflow_context, &frame->vnode_image);
+				break;
+			case SP_DEV_ISP:
+				vp_isp_release_frame(&m_vp_vflow_context, &frame->vnode_image);
+				break;
+			case SP_DEV_VSE:
+				chn = GetChnId(width, height);
+				if (chn >= 0) {
+					vp_vse_release_frame(&m_vp_vflow_context, chn, &frame->vnode_image);
+				} else {
+					SC_LOGE("get chn from %dx%d failed", width, height);
+					return;
+				}
+				break;
+			default:
+				SC_LOGE("Error: module not supported!\n");
 			}
-			break;
-		default:
-			SC_LOGE("Error: module not supported!\n");
 		}
 	}
 
@@ -639,19 +747,26 @@ namespace spdev
 			width = GetModuleWidth();
 			height = GetModuleHeight();
 		}
-		// VSE 有多个输出通道，根据用户输入的分辨率，找到对应的通道号
-		vse_config_t *vse_config = &m_vp_vflow_context.vse_config;
-		for (int32_t i = 0; i < VSE_MAX_CHN_NUM; i++)
+		if(useV4l2)
 		{
-
-			if ((vse_config->vse_ochn_attr[i].chn_en == CAM_TRUE)
-				&& (vse_config->vse_ochn_attr[i].target_w == width)
-				&& (vse_config->vse_ochn_attr[i].target_h == height))
-			{
-				return i;
-			}
+			return vp_v4l2_found_chn(width, height);
 		}
-		return -1;
+		else
+		{
+			// VSE 有多个输出通道，根据用户输入的分辨率，找到对应的通道号
+			vse_config_t *vse_config = &m_vp_vflow_context.vse_config;
+			for (int32_t i = 0; i < VSE_MAX_CHN_NUM; i++)
+			{
+
+				if ((vse_config->vse_ochn_attr[i].chn_en == CAM_TRUE)
+					&& (vse_config->vse_ochn_attr[i].target_w == width)
+					&& (vse_config->vse_ochn_attr[i].target_h == height))
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
 	}
 
 	int32_t VPPCamera::GetChnIdForBind(int32_t width, int32_t height)
@@ -661,19 +776,27 @@ namespace spdev
 			width = GetModuleWidth();
 			height = GetModuleHeight();
 		}
-		// VSE 有多个输出通道，根据用户输入的分辨率，找到对应的通道号
-		vse_config_t *vse_config = &m_vp_vflow_context.vse_config;
-		for (int32_t i = 0; i < VSE_MAX_CHN_NUM; i++)
-		{
 
-			if ((vse_config->vse_ochn_attr[i].chn_en == CAM_TRUE)
-				&& (vse_config->vse_ochn_attr[i].target_w == width)
-				&& (vse_config->vse_ochn_attr[i].target_h == height))
-			{
-				return i;
-			}
+		if(useV4l2)
+		{
+			return vp_v4l2_found_chn(width, height);
 		}
-		return -1;
+		else
+		{
+			// VSE 有多个输出通道，根据用户输入的分辨率，找到对应的通道号
+			vse_config_t *vse_config = &m_vp_vflow_context.vse_config;
+			for (int32_t i = 0; i < VSE_MAX_CHN_NUM; i++)
+			{
+
+				if ((vse_config->vse_ochn_attr[i].chn_en == CAM_TRUE)
+					&& (vse_config->vse_ochn_attr[i].target_w == width)
+					&& (vse_config->vse_ochn_attr[i].target_h == height))
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
 	}
 
 	void VPPCamera::PutChnIdForUnBind(int32_t chn_id)

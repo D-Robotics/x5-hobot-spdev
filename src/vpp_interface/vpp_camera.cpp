@@ -95,14 +95,6 @@ namespace spdev
 				break;
 			}
 
-			// parse i2c_bus
-			cJSON *i2c_bus_obj = cJSON_GetObjectItem(camera, "i2c_bus");
-			if (i2c_bus_obj == NULL) {
-				ret = -1;
-				goto exit;
-			}
-			camera_info[i].i2c_bus = i2c_bus_obj->valueint;
-
 			// parse mipi_host
 			cJSON *mipi_host_obj = cJSON_GetObjectItem(camera, "mipi_host");
 			if (mipi_host_obj == NULL) {
@@ -228,7 +220,6 @@ namespace spdev
 		for (int i = 0; i < MAX_CAMERAS; i++) {
 			printf("Camera %d:\n", i);
 			// printf("\tenable: %d\n", camera_info[i].enable);
-			printf("\ti2c_bus: %d\n", camera_info[i].i2c_bus);
 			printf("\tmipi_host: %d\n", camera_info[i].mipi_host);
 		}
 
@@ -443,7 +434,6 @@ namespace spdev
 			for (int i = 0; i < MAX_CAMERAS; i++) {
 				printf("Camera %d:\n", i);
 				printf("\tenable: %d\n", camera_info[i].enable);
-				printf("\ti2c_bus: %d\n", camera_info[i].i2c_bus);
 				printf("\tmipi_host: %d\n", camera_info[i].mipi_host);
 			}
 

@@ -181,7 +181,7 @@ void sp_get_display_resolution(int32_t *width, int32_t *height) {
         return;
     }
 
-    fd = open("/dev/dri/card0", O_RDWR | O_CLOEXEC);
+    fd = open("/dev/dri/card1", O_RDWR | O_CLOEXEC);
     if (fd < 0) {
         printf("Failed to open DRM device\n");
         free(resolutions);

@@ -67,7 +67,7 @@ bool is_x11_or_wayland_available() {
 }
 
 bool is_drm_available() {
-	int fd = open("/dev/dri/card0", O_RDWR | O_CLOEXEC);
+	int fd = open("/dev/dri/card1", O_RDWR | O_CLOEXEC);
 	if (fd < 0) {
 		return false;
 	}

@@ -60,12 +60,12 @@
 #define VIDEO_DEV_CSI3_VSE4 "/dev/video30"
 #define VIDEO_DEV_CSI3_VSE5 "/dev/video31"
 
-#define VIDEO_DEV_VSE0 "/dev/video32"
-#define VIDEO_DEV_VSE1 "/dev/video33"
-#define VIDEO_DEV_VSE2 "/dev/video34"
-#define VIDEO_DEV_VSE3 "/dev/video35"
-#define VIDEO_DEV_VSE4 "/dev/video36"
-#define VIDEO_DEV_VSE5 "/dev/video37"
+#define VIDEO_DEV_VSE0 "/dev/video0"
+#define VIDEO_DEV_VSE1 "/dev/video1"
+#define VIDEO_DEV_VSE2 "/dev/video2"
+#define VIDEO_DEV_VSE3 "/dev/video3"
+#define VIDEO_DEV_VSE4 "/dev/video4"
+#define VIDEO_DEV_VSE5 "/dev/video5"
 
 #define MAX_CAMERAS 4
 #define BUFFER_COUNT 3

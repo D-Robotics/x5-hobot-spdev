@@ -938,7 +938,7 @@ void vp_decode_work_func(void *param)
 
 	context = dec_param->context;
 
-	SC_LOGE("stream_path: %s", dec_param->stream_path);
+	SC_LOGD("stream_path: %s", dec_param->stream_path);
 
 	video_idx = AV_open_stream(dec_param, &avContext, &avpacket);
 	if (video_idx < 0)

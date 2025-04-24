@@ -953,13 +953,31 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 			j = 0;
 			if(sensor_n > 1)
 			{
-				printf("plase choose sensor config,the number should small than %d\n",sensor_n);
-				scanf("%d", &j);
-				if (j >= sensor_n) 
+				/* 这里需要更改一下，不能手动选， 看用 fps 匹配的策略 还是 什么方法 ，现在明确，优先完整匹配，但如果不匹配，就选择最接近的一项，然后输出log，进行提醒。*/
+				int best_index = 0;
+				int max_resolution = 0;
+				int max_fps = 0;
+				for (int k = 0; k < sensor_n; k++) 
 				{
-					printf("The number is greater than sensor_n %d ,use 0\n", sensor_n);
-					j = 0;
+					vp_sensor_config_t *config = vp_sensor_config_list[sensor_list[k]];
+					int current_res = config->camera_config->width * config->camera_config->height;
+					int current_fps = config->camera_config->fps;
+
+					// 优先比较分辨率，若相同则比较 FPS
+					if (current_res > max_resolution || 
+					(current_res == max_resolution && current_fps > max_fps)) 
+					{
+						best_index = k;
+						max_resolution = current_res;
+						max_fps = current_fps;
+					}
 				}
+				j = best_index;
+				printf("Auto-selected sensor: %s (Resolution: %dx%d@%dfps)\n",
+					vp_sensor_config_list[sensor_list[j]]->sensor_name,
+					vp_sensor_config_list[sensor_list[j]]->camera_config->width,
+					vp_sensor_config_list[sensor_list[j]]->camera_config->height,
+					vp_sensor_config_list[sensor_list[j]]->camera_config->fps);
 			}
 			/* Fixed Mipi host */
 			vp_sensor_config_list[sensor_list[j]]->vin_node_attr->cim_attr.mipi_rx = vcon_props_array[mipi_host_index].rx_phy[1];

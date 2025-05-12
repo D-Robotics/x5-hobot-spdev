@@ -436,11 +436,13 @@ int32_t vp_encode_config_param(media_codec_context_t *context, media_codec_id_t 
 		params->rc_params.mode = MC_AV_RC_MODE_MJPEGFIXQP;
 		get_rc_params(context, &params->rc_params);
 		params->mjpeg_enc_config.restart_interval = width / 16;
+		params->bitstream_buf_size = (width * height * 3 / 2  + 0xfff) & ~0xfff;
 		break;
 	case MEDIA_CODEC_ID_JPEG:
 		context->codec_id = MEDIA_CODEC_ID_JPEG;
 		params->jpeg_enc_config.quality_factor = 50;
 		params->mjpeg_enc_config.restart_interval = width / 16;
+		params->bitstream_buf_size = (width * height * 3 / 2  + 0xfff) & ~0xfff;
 		break;
 	default:
 		SC_LOGE("Not Support encoding type: %d!\n", codec_type);

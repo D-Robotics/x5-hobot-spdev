@@ -154,6 +154,37 @@ namespace spdev
 		cJSON_Delete(root);
 		return ret;
 	}
+
+	static int get_mipihost_from_v4lsubdev0()
+	{
+		FILE *fp = fopen("/sys/class/video4linux/v4l-subdev0/name", "r");
+		if (!fp) {
+			perror("Failed to open subdev name file");
+			return -1;
+		}
+
+		char buffer[128];
+		if (!fgets(buffer, sizeof(buffer), fp)) {
+			perror("Failed to read subdev name");
+			fclose(fp);
+			return -1;
+		}
+		fclose(fp);
+
+		char *csi_ptr = strstr(buffer, "csi");
+		if (!csi_ptr) {
+			return -1;
+		}
+		csi_ptr += 3;
+		while (*csi_ptr) {
+			if (isdigit(*csi_ptr)) {
+				return *csi_ptr - '0';
+			}
+			csi_ptr++;
+		}
+		return 0;
+	}
+
 	int32_t VPPCamera::SelectVseChn(int *chn_en, int src_width, int src_height,
 		int dst_width, int dst_height)
 	{
@@ -439,7 +470,7 @@ namespace spdev
 
 			if(video_index == -1)
 			{
-				mipi_host = 0;
+				mipi_host = get_mipihost_from_v4lsubdev0();
 			}
 			else if(video_index > 0 && video_index < MAX_CAMERAS)
 			{

@@ -273,8 +273,6 @@ int32_t vp_v4l2_open(v4l2_info_s *v4l2_info, char *camera_dev, int dev_type)
         return -1;
     }
 
-    sleep(1);
-
     memset(&fmt, 0, sizeof(fmt));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     fmt.fmt.pix.width = v4l2_info->width;
@@ -580,9 +578,10 @@ int32_t vp_v4l2_init(const int32_t video_index, int32_t src_width, int32_t src_h
     char *v4l2_camera_name = NULL;
     int i;
 
-#if 1
+    printf("video_index %d src_width %d src_height %d\n", video_index, src_width, src_height);
     //SIF
-    v4l2_camera_name = get_video_device(video_index,0, V4L2_DEV_SIF);
+    v4l2_camera_name = get_video_device(video_index, 0, V4L2_DEV_SIF);
+    printf("SIF v4l2_camera_name %s\n", v4l2_camera_name);
     if (v4l2_camera_name == NULL) {
         perror("get_video_device_sif");
         return -1;
@@ -593,11 +592,11 @@ int32_t vp_v4l2_init(const int32_t video_index, int32_t src_width, int32_t src_h
         perror("Failed vp_v4l2_open");
         return -1;
     }
-    printf("SIF src_width %d src_height %d dst_width %d  dst_height %d v4l2_camera_name %s v4l2_fd %d\n", 
-        src_width, src_height, dst_width[i], dst_height[i], v4l2_camera_name,vp_v4l2_info_sif.v4l2_fd);
+    printf("SIF v4l2_fd %d\n", vp_v4l2_info_sif.v4l2_fd);
 
     //ISP
-    v4l2_camera_name = get_video_device(video_index,0, V4L2_DEV_ISP);
+    v4l2_camera_name = get_video_device(video_index, 0, V4L2_DEV_ISP);
+    printf("ISP v4l2_camera_name %s\n", v4l2_camera_name);
     if (v4l2_camera_name == NULL) {
         perror("get_video_device");
         return -1;
@@ -608,9 +607,8 @@ int32_t vp_v4l2_init(const int32_t video_index, int32_t src_width, int32_t src_h
         perror("Failed vp_v4l2_open");
         return -1;
     }
-    printf("ISP src_width %d src_height %d dst_width %d  dst_height %d v4l2_camera_name %s v4l2_fd %d\n", 
-        src_width, src_height, dst_width[i], dst_height[i], v4l2_camera_name,vp_v4l2_info_isp.v4l2_fd);
-#endif
+    printf("ISP v4l2_fd %d\n", vp_v4l2_info_isp.v4l2_fd);
+
     //VSE
     for (i = 0; i < chn_num; i++) {
         if ((dst_width[i] == 0) && (dst_height[i] == 0)) {//如果高宽为0，那么就开一个和原始高宽一致的通道
@@ -619,8 +617,7 @@ int32_t vp_v4l2_init(const int32_t video_index, int32_t src_width, int32_t src_h
         }
         vse_chn = vp_v4l2_vse_select(&vse_chn_en, src_width, src_height, dst_width[i], dst_height[i]);
         if (vse_chn < 0) {
-            printf("Invalid vp_v4l2_vse_select chn_num %d vse_chn %d src_width %d src_height %d dst_width %d  dst_height %d v4l2_camera_name %s\n", 
-            i, vse_chn, src_width, src_height, dst_width[i], dst_height[i], v4l2_camera_name);
+            printf("Invalid vp_v4l2_vse_select chn_num %d vse_chn %d dst_width %d  dst_height %d\n", i, vse_chn, dst_width[i], dst_height[i]);
             return -1;
         }
         vse_chn_en |= 1 << vse_chn;

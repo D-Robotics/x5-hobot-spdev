@@ -116,8 +116,8 @@ int32_t read_nv12_image(v4l2_info_s *v4l2_info, hbn_vnode_image_t *input_image,c
         return -1;
     }
 
-    memcpy((char *)(input_image->buffer.virt_addr[0]), buffer, y_size/3*2);
-	memcpy((char *)(input_image->buffer.virt_addr[1]), buffer + y_size/3*2, y_size/3);
+    memcpy((char *)(input_image->buffer.virt_addr[0]), buffer, v4l2_info->height*v4l2_info->width);
+	memcpy((char *)(input_image->buffer.virt_addr[1]), buffer + y_size/3*2, v4l2_info->height*v4l2_info->width/2);
 
 	// 设置一个时间戳
 	gettimeofday(&input_image->info.tv, NULL);
@@ -148,7 +148,7 @@ int32_t read_nv12_image_sif(v4l2_info_s *v4l2_info, hbn_vnode_image_t *input_ima
         return -1;
     }
 
-    memcpy((char *)(input_image->buffer.virt_addr[0]), buffer, y_size);
+    memcpy((char *)(input_image->buffer.virt_addr[0]), buffer, v4l2_info->height*v4l2_info->width*2);
 
 	// 设置一个时间戳
 	gettimeofday(&input_image->info.tv, NULL);

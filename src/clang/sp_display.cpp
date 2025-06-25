@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
+#include <glob.h>
 
 #include "utils_log.h"
 #include "vpp_display.h"
@@ -167,6 +168,30 @@ int resolution_exists(Resolution *resolutions, int count, Resolution new_res) {
     return 0;
 }
 
+int open_drm_by_glob() {
+    glob_t glob_result;
+    int fd = -1;
+
+    if (glob("/dev/dri/card*", 0, NULL, &glob_result) == 0) {
+        if (glob_result.gl_pathc > 0) {
+            const char *path = glob_result.gl_pathv[0];
+            fd = open(path, O_RDWR | O_CLOEXEC);
+            if (fd >= 0) {
+                printf("Opened DRM device: %s\n", path);
+            } else {
+                perror("open");
+            }
+        } else {
+            fprintf(stderr, "No DRM devices found.\n");
+        }
+        globfree(&glob_result);
+    } else {
+        perror("glob");
+    }
+
+    return fd;
+}
+
 void sp_get_display_resolution(int32_t *width, int32_t *height) {
     int fd;
     drmModeRes *resources;
@@ -181,7 +206,7 @@ void sp_get_display_resolution(int32_t *width, int32_t *height) {
         return;
     }
 
-    fd = open("/dev/dri/card1", O_RDWR | O_CLOEXEC);
+    fd = open_drm_by_glob();
     if (fd < 0) {
         printf("Failed to open DRM device\n");
         free(resolutions);

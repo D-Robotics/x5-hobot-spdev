@@ -34,6 +34,7 @@
 #include <chrono>
 #include <iomanip>
 #include <ctime>
+#include <glob.h>
 
 #include "utils_log.h"
 #include "egl_preview.h"
@@ -66,8 +67,33 @@ bool is_x11_or_wayland_available() {
 	return false;
 }
 
+int open_drm_by_glob() {
+    glob_t glob_result;
+    int fd = -1;
+
+    if (glob("/dev/dri/card*", 0, NULL, &glob_result) == 0) {
+        if (glob_result.gl_pathc > 0) {
+            const char *path = glob_result.gl_pathv[0];
+            fd = open(path, O_RDWR | O_CLOEXEC);
+            if (fd >= 0) {
+                printf("Opened DRM device: %s\n", path);
+            } else {
+                perror("open");
+            }
+        } else {
+            fprintf(stderr, "No DRM devices found.\n");
+        }
+        globfree(&glob_result);
+    } else {
+        perror("glob");
+    }
+
+    return fd;
+}
+
+
 bool is_drm_available() {
-	int fd = open("/dev/dri/card1", O_RDWR | O_CLOEXEC);
+	int fd = open_drm_by_glob();
 	if (fd < 0) {
 		return false;
 	}

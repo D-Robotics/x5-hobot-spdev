@@ -387,7 +387,7 @@ namespace spdev
 				SC_LOGE("Invalid size:%dx%d\n", dst_width[i], dst_height[i]);
 				return -1;
 			}
-			if (proc_mode >= VPS_SCALE) {
+			if (proc_mode == VPS_SCALE) {
 				vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
 				vse_config->vse_ochn_attr[vse_chn].roi.x = 0;
 				vse_config->vse_ochn_attr[vse_chn].roi.y = 0;
@@ -397,7 +397,7 @@ namespace spdev
 				vse_config->vse_ochn_attr[vse_chn].target_h = dst_height[i];
 				vse_config->vse_ochn_attr[vse_chn].fmt = FRM_FMT_NV12;
 				vse_config->vse_ochn_attr[vse_chn].bit_width = 8;
-			} else if ((proc_mode == VPS_SCALE_CROP)) {
+			} else if (proc_mode == VPS_SCALE_CROP) {
 				vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
 				vse_config->vse_ochn_attr[vse_chn].roi.x = crop_x[i];
 				vse_config->vse_ochn_attr[vse_chn].roi.y = crop_y[i];
@@ -407,10 +407,7 @@ namespace spdev
 				vse_config->vse_ochn_attr[vse_chn].target_h = dst_height[i];
 				vse_config->vse_ochn_attr[vse_chn].fmt = FRM_FMT_NV12;
 				vse_config->vse_ochn_attr[vse_chn].bit_width = 8;
-			}
-			if ((proc_mode == VPS_SCALE_ROTATE)
-				|| (proc_mode == VPS_SCALE_ROTATE_CROP)
-				|| (proc_mode == VPS_SCALE_ROTATE_CROP)) {
+			} else if (proc_mode >= VPS_SCALE_ROTATE) {
 				SC_LOGE("VSE does not support rotating images");
 				return -1;
 			}

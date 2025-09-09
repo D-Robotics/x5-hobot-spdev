@@ -38,14 +38,14 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
     version = version_file.read().strip()
 
 setup(
-    name="hobot_dnn",
+    name="hobot_dnn_rdkx5",
     version=version,
     author="d-robotics",
     author_email="technical_support@d-robotics.cc",
     description="python API for Deep Neural Network inference engine",
     classifiers = classifiers,
     package_dir = {'': './'},
-    packages = ['hobot_dnn'],
-    package_data = {'hobot_dnn': ['libdnnpy.so', 'pyeasy_dnn.so']},
+    packages = ['hobot_dnn_rdkx5'],
+    package_data = {'hobot_dnn_rdkx5': ['libdnnpy.so', 'pyeasy_dnn.so']},
     include_package_data = True,
 )

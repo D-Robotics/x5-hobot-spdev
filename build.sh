@@ -100,30 +100,31 @@ function cmake_build() {
 
 	# make hobot_vio whl
 	cd "${BUILD_DIR}"
-	mkdir -p "${BUILD_DIR}"/python_hobot_vio
-	cp -arf "${ALL_PROJECT_DIR}/python/hobot_vio" "${BUILD_DIR}"/python_hobot_vio
-	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_vio.py" "${BUILD_DIR}"/python_hobot_vio
-	cp -arf "${BUILD_DIR}/src/libhbspdev.so" "${BUILD_DIR}/python_hobot_vio/hobot_vio/"
-	cp -arf "${BUILD_DIR}/src/libsrcampy.so" "${BUILD_DIR}/python_hobot_vio/hobot_vio/"
-	cd "${BUILD_DIR}/python_hobot_vio"
+	mkdir -p "${BUILD_DIR}"/python_hobot_vio_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/hobot_vio" "${BUILD_DIR}"/python_hobot_vio_rdkx5/hobot_vio_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_vio.py" "${BUILD_DIR}"/python_hobot_vio_rdkx5
+	cp -arf "${BUILD_DIR}/src/libhbspdev.so" "${BUILD_DIR}/python_hobot_vio_rdkx5/hobot_vio_rdkx5/"
+	cp -arf "${BUILD_DIR}/src/libsrcampy.so" "${BUILD_DIR}/python_hobot_vio_rdkx5/hobot_vio_rdkx5/"
+	cd "${BUILD_DIR}/python_hobot_vio_rdkx5"
 	python3 setup_hobot_vio.py bdist_wheel
 
-	cp "${BUILD_DIR}/python_hobot_vio/dist/"*.whl "${OUTPUT_DIR}"
+	cp "${BUILD_DIR}/python_hobot_vio_rdkx5/dist/"*.whl "${OUTPUT_DIR}"
 
 
 	# make hobot_vio whl
-	mkdir -p "${BUILD_DIR}"/python_hobot_dnn
-	cp -arf "${ALL_PROJECT_DIR}/python/hobot_dnn" "${BUILD_DIR}"/python_hobot_dnn
-	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_dnn.py" "${BUILD_DIR}"/python_hobot_dnn
-	cp -arf "${BUILD_DIR}/src/libdnnpy.so" "${BUILD_DIR}/python_hobot_dnn/hobot_dnn/"
-	cd "${BUILD_DIR}/python_hobot_dnn"
+	mkdir -p "${BUILD_DIR}"/python_hobot_dnn_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/hobot_dnn" "${BUILD_DIR}"/python_hobot_dnn_rdkx5/hobot_dnn_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_dnn.py" "${BUILD_DIR}"/python_hobot_dnn_rdkx5
+	cp -arf "${BUILD_DIR}/src/libdnnpy.so" "${BUILD_DIR}/python_hobot_dnn_rdkx5/hobot_dnn_rdkx5/"
+	cd "${BUILD_DIR}/python_hobot_dnn_rdkx5"
 	python3 setup_hobot_dnn.py bdist_wheel
-	cp "${BUILD_DIR}/python_hobot_dnn/dist/"*.whl "${OUTPUT_DIR}"
+	cp "${BUILD_DIR}/python_hobot_dnn_rdkx5/dist/"*.whl "${OUTPUT_DIR}"
 
 	mkdir -p "${OUTPUT_DIR}/include"
 	cp "${SCRIPTS_DIR}/src/clang/"*.h "${OUTPUT_DIR}/include"
 }
 
+#twine upload --repository pypi dist/*
 # Main execution
 #build_clean
 cmake_build

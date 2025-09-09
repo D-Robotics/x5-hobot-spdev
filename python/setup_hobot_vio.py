@@ -38,14 +38,14 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
     version = version_file.read().strip()
 
 setup(
-    name="hobot_vio",
+    name="hobot_vio_rdkx5",
     version=version,
     author="d-robotics",
     author_email="technical_support@d-robotics.cc",
     description="python API for VIO",
     classifiers = classifiers,
     package_dir = {'': './'},
-    packages = ['hobot_vio'],
-    package_data = {'hobot_vio': ['libhbspdev.so', 'libsrcampy.so',]},
+    packages = ['hobot_vio_rdkx5'],
+    package_data = {'hobot_vio_rdkx5': ['libhbspdev.so', 'libsrcampy.so',]},
     include_package_data = True,
 )

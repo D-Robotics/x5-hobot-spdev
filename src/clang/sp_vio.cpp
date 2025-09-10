@@ -52,6 +52,8 @@ int32_t sp_open_camera(void *obj, const int32_t pipe_id,
 {
     if (obj != NULL)
     {
+        vp_sensors_parameters parameters;
+
         auto sp = static_cast<VPPCamera *>(obj);
         int32_t width[VSE_MAX_CHN_NUM] = {0};
         int32_t height[VSE_MAX_CHN_NUM] = {0};
@@ -64,7 +66,13 @@ int32_t sp_open_camera(void *obj, const int32_t pipe_id,
             height[chn_num] = 0;
             chn_num++;
         }
-        return sp->OpenCamera(pipe_id, video_index, chn_num, width, height, NULL);
+
+        memset(&parameters, 0, sizeof(vp_sensors_parameters));
+        parameters.raw_width = 1920;
+        parameters.raw_height = 1080;
+        parameters.fps =-1;
+
+        return sp->OpenCamera(pipe_id, video_index, chn_num, width, height, &parameters);
     }
     return -1;
 }

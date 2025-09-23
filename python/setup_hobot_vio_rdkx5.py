@@ -38,17 +38,14 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)),
     version = version_file.read().strip()
 
 setup(
-    name="hobot_dnn",
+    name="hobot_vio_rdkx5",
     version=version,
     author="d-robotics",
     author_email="technical_support@d-robotics.cc",
-    description="python API for Deep Neural Network inference engine",
+    description="python API for VIO",
     classifiers = classifiers,
     package_dir = {'': './'},
-    packages = ['hobot_dnn'],
-    package_data = {'hobot_dnn': ['libdnnpy.so', 'pyeasy_dnn.so']},
+    packages = ['hobot_vio_rdkx5'],
+    package_data = {'hobot_vio_rdkx5': ['libhbspdev.so', 'libsrcampy.so',]},
     include_package_data = True,
-    install_requires=[
-        "numpy>=1.26.4"
-    ],
 )

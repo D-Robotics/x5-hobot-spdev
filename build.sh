@@ -110,6 +110,14 @@ function cmake_build() {
 
 	cp "${BUILD_DIR}/python_hobot_vio/dist/"*.whl "${OUTPUT_DIR}"
 
+	# make hobot_vio_rdkx5 whl
+	mkdir -p "${BUILD_DIR}"/python_hobot_vio_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/hobot_vio" "${BUILD_DIR}"/python_hobot_vio_rdkx5/hobot_vio_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_vio_rdkx5.py" "${BUILD_DIR}"/python_hobot_vio_rdkx5
+	cp -arf "${BUILD_DIR}/src/libhbspdev.so" "${BUILD_DIR}/python_hobot_vio_rdkx5/hobot_vio_rdkx5/"
+	cp -arf "${BUILD_DIR}/src/libsrcampy.so" "${BUILD_DIR}/python_hobot_vio_rdkx5/hobot_vio_rdkx5/"
+	cd "${BUILD_DIR}/python_hobot_vio_rdkx5"
+	python3 setup_hobot_vio_rdkx5.py bdist_wheel
 
 	# make hobot_vio whl
 	mkdir -p "${BUILD_DIR}"/python_hobot_dnn
@@ -118,7 +126,16 @@ function cmake_build() {
 	cp -arf "${BUILD_DIR}/src/libdnnpy.so" "${BUILD_DIR}/python_hobot_dnn/hobot_dnn/"
 	cd "${BUILD_DIR}/python_hobot_dnn"
 	python3 setup_hobot_dnn.py bdist_wheel
+
 	cp "${BUILD_DIR}/python_hobot_dnn/dist/"*.whl "${OUTPUT_DIR}"
+
+	# make hobot_vio_rdkx5 whl
+	mkdir -p "${BUILD_DIR}"/python_hobot_dnn_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/hobot_dnn" "${BUILD_DIR}"/python_hobot_dnn_rdkx5/hobot_dnn_rdkx5
+	cp -arf "${ALL_PROJECT_DIR}/python/setup_hobot_dnn_rdkx5.py" "${BUILD_DIR}"/python_hobot_dnn_rdkx5
+	cp -arf "${BUILD_DIR}/src/libdnnpy.so" "${BUILD_DIR}/python_hobot_dnn_rdkx5/hobot_dnn_rdkx5/"
+	cd "${BUILD_DIR}/python_hobot_dnn_rdkx5"
+	python3 setup_hobot_dnn_rdkx5.py bdist_wheel
 
 	mkdir -p "${OUTPUT_DIR}/include"
 	cp "${SCRIPTS_DIR}/src/clang/"*.h "${OUTPUT_DIR}/include"

@@ -1,8 +1,8 @@
 #include "vp_sensors.h"
 
 #define SENSOR_WIDTH  1280
-#define SENSOR_HEIGHT  960
-#define SENSOE_FPS 30
+#define SENSOR_HEIGHT  720
+#define SENSOE_FPS 15
 #define RAW10 0x2B
 
 static mipi_config_t mipi_config = {
@@ -12,34 +12,30 @@ static mipi_config_t mipi_config = {
 		.lane = 2,
 		.datatype = RAW10,
 		.fps = SENSOE_FPS,
-		.mclk = 24,
-		.mipiclk = 1000,
+		.mclk = 1,
+		.mipiclk = 360,   //180
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 1896,
-		.framelenth = 1435,
-		.settle = 30,
+		.linelenth = 1600,
+		.framelenth = 1500,
+		.settle = 20,
 		.channel_num = 1,
 		.channel_sel = {0},
-	},
-	.rx_ex_mask = 0x20,
-	.rx_attr_ex = {
-		.need_stop_check = 1,
 	},
 };
 
 static camera_config_t camera_config = {
-	.name = "ov5647",
-	.addr = 0x36,
+	.name = "sc1336",
+	.addr = 0x30,
 	.sensor_mode = NORMAL_M,
 	.fps = SENSOE_FPS,
 	.format = RAW10,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
-	.mipi_cfg = &mipi_config,
-	.gpio_enable_bit = 0x01,
+	.gpio_enable_bit = 0x07,
 	.gpio_level_bit = 0x00,
-	.calib_lname = "/usr/hobot/lib/sensor/ov5647_1280x960_tuning.json",
+	.mipi_cfg = &mipi_config,
+	.calib_lname = "disable",
 };
 
 static vin_node_attr_t vin_node_attr = {
@@ -47,6 +43,7 @@ static vin_node_attr_t vin_node_attr = {
 		.mipi_rx = 2,
 		.vc_index = 0,
 		.ipi_channel = 1,
+		// SIF online/offline ISP
 		.cim_isp_flyby = 1,
 		.func = {
 			.enable_frame_id = 1,
@@ -58,12 +55,13 @@ static vin_node_attr_t vin_node_attr = {
 	},
 };
 
-static vin_attr_ex_t ov5647_vin_attr_ex = {
-	.vin_attr_ex_mask = 0x00,
+static vin_attr_ex_t vin_attr_ex = {
+	.vin_attr_ex_mask = 0x80,
 	.mclk_ex_attr = {
 		.mclk_freq = 24000000,
 	},
 };
+
 
 static vin_ichn_attr_t vin_ichn_attr = {
 	.width = SENSOR_WIDTH,
@@ -72,6 +70,7 @@ static vin_ichn_attr_t vin_ichn_attr = {
 };
 
 static vin_ochn_attr_t vin_ochn_attr = {
+	// 使能数据输出至DDR
 	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
@@ -84,6 +83,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 
 static isp_attr_t isp_attr = {
 	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	// 使用Linear模式
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -106,15 +106,15 @@ static isp_ochn_attr_t isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t ov5647_linear_1280x960_raw10_30fps_2lane = {
-	.chip_id_reg = 0x300A,
-	.chip_id = 0x5647,
-	.sensor_name = "ov5647-1280x960-30fps",
-	.config_file = "linear_1280x960_raw10_30fps_2lane.c",
+vp_sensor_config_t sc1336_linear_1280x720_raw10_15fps_2lane = {
+	.chip_id_reg = 0x3107,
+	.chip_id = 0xca3f,
+	.sensor_name = "sc1336",
+	.config_file = "linear_1280x720_raw10_15fps_2lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,
 	.vin_node_attr = &vin_node_attr,
-	.vin_attr_ex   = &ov5647_vin_attr_ex,
+	.vin_attr_ex   = &vin_attr_ex,
 	.vin_ochn_attr = &vin_ochn_attr,
 	.isp_attr      = &isp_attr,
 	.isp_ichn_attr = &isp_ichn_attr,

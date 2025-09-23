@@ -33,14 +33,30 @@ extern vp_sensor_config_t sc1330t_linear_1280x960_raw10_30fps_1lane;
 extern vp_sensor_config_t irs2875_linear_208x1413_raw12_15fps_2lane;
 extern vp_sensor_config_t sc230ai_linear_1920x1080_raw10_10fps_1lane;
 extern vp_sensor_config_t sc230ai_linear_1920x1080_raw10_30fps_1lane;
-extern vp_sensor_config_t sc132gs_linear_1088x1280_raw10_30fps_1lane;
+extern vp_sensor_config_t sc230ai_dol2_1920x1080_raw10_30fps_2lane;
+extern vp_sensor_config_t sc132gs_linear_1088x1280_raw10_60fps_1lane;
+extern vp_sensor_config_t sc132gs_hdr_1088x1280_raw10_30fps_2lane;
 extern vp_sensor_config_t sc035hgs_linear_640x480_raw10_30fps_1lane;
+extern vp_sensor_config_t sc035hgs_mono_640x480_raw10_30fps_1lane;
 extern vp_sensor_config_t ov5640_linear_1920x1080_raw10_30fps_2lane;
 extern vp_sensor_config_t f37_linear_1920x1080_raw10_30fps_1lane;
 extern vp_sensor_config_t imx415_linear_3480x2160_raw10_30fps_4lane;
 extern vp_sensor_config_t imx415_linear_3480x2160_raw10_30fps_2lane;
 extern vp_sensor_config_t sc202cs_linear_1600x1200_raw10_30fps_1lane;
 extern vp_sensor_config_t irs2381c_linear_224x1903_raw12_5fps_2lane;
+extern vp_sensor_config_t sc035hgs_linear_640x480_raw10_30fps_2lane_vc0;
+extern vp_sensor_config_t sc035hgs_linear_640x480_raw10_30fps_2lane_vc1;
+extern vp_sensor_config_t sc231ai_linear_1920x1080_raw10_30fps_2lane;
+extern vp_sensor_config_t imx586_linear_3480x2160_raw10_30fps_4lane;
+extern vp_sensor_config_t os08c10_linear_3480x2160_raw12_30fps_2lane;
+extern vp_sensor_config_t ar0233_linear_1920x1080_raw12_30fps_2lane;
+extern vp_sensor_config_t ar0820std_linear_3840x2160_yuv422_30fps_4lane;
+extern vp_sensor_config_t sc1336_linear_1280x720_raw10_15fps_2lane;
+extern vp_sensor_config_t dummy_sensor_config;
+extern vp_sensor_config_t ar0233_linear_1920x1080_raw12_30fps_2lane_vc0;
+extern vp_sensor_config_t ar0233_linear_1920x1080_raw12_30fps_2lane_vc1;
+extern vp_sensor_config_t ov9782_linear_640x360_raw10_200fps_2lane;
+extern vp_sensor_config_t ov9782_linear_1280x720_raw10_120fps_2lane;
 extern vp_sensor_config_t imx219_linear_640x480_raw10_30fps_2lane;
 extern vp_sensor_config_t imx219_linear_1632x1232_raw10_30fps_2lane;
 extern vp_sensor_config_t imx219_linear_1920x1080_raw10_30fps_2lane;
@@ -54,25 +70,42 @@ extern vp_sensor_config_t imx477_linear_1280x960_raw10_120fps_2lane;
 extern vp_sensor_config_t imx477_linear_1920x1080_raw12_50fps_2lane;
 extern vp_sensor_config_t imx477_linear_2016x1520_raw12_40fps_2lane;
 extern vp_sensor_config_t imx477_linear_4000x3000_raw12_10fps_2lane;
-extern vp_sensor_config_t sc035hgs_linear_640x480_raw10_30fps_2lane_vc0;
-extern vp_sensor_config_t sc035hgs_linear_640x480_raw10_30fps_2lane_vc1;
-extern vp_sensor_config_t sc231ai_linear_1920x1080_raw10_30fps_2lane;
-extern vp_sensor_config_t imx586_linear_3480x2160_raw10_30fps_4lane;
-extern vp_sensor_config_t os08c10_linear_3480x2160_raw12_30fps_2lane;
+extern vp_sensor_config_t ov50h40_linear_4096x3072_raw10_30fps_4lane;
+extern vp_sensor_config_t ox05b1s_linear_2592x1944_raw10_30fps_4lane;
+extern vp_sensor_config_t ox05b1s_linear_2592x1944_raw10_10fps_2lane;
+extern vp_sensor_config_t imx415_linear_3480x2160_raw10_60fps_4lane;
+extern vp_sensor_config_t sc850sl_linear_3840x2160_raw10_30fps_4lane;
+extern vp_sensor_config_t shw3g_linear_2064x1552_raw12_30fps_4lane;
 
 vp_sensor_config_t *vp_sensor_config_list[] = {
 	&sc1330t_linear_1280x960_raw10_30fps_1lane,
 	&irs2875_linear_208x1413_raw12_15fps_2lane,
 	&sc230ai_linear_1920x1080_raw10_10fps_1lane,
 	&sc230ai_linear_1920x1080_raw10_30fps_1lane,
-	&sc132gs_linear_1088x1280_raw10_30fps_1lane,
+	&sc230ai_dol2_1920x1080_raw10_30fps_2lane,
+	&sc132gs_linear_1088x1280_raw10_60fps_1lane,
+	&sc132gs_hdr_1088x1280_raw10_30fps_2lane,
 	&sc035hgs_linear_640x480_raw10_30fps_1lane,
+	&sc035hgs_mono_640x480_raw10_30fps_1lane,
 	&ov5640_linear_1920x1080_raw10_30fps_2lane,
 	&f37_linear_1920x1080_raw10_30fps_1lane,
 	&imx415_linear_3480x2160_raw10_30fps_2lane,
 	&imx415_linear_3480x2160_raw10_30fps_4lane,
 	&sc202cs_linear_1600x1200_raw10_30fps_1lane,
 	&irs2381c_linear_224x1903_raw12_5fps_2lane,
+	&sc035hgs_linear_640x480_raw10_30fps_2lane_vc0,
+	&sc035hgs_linear_640x480_raw10_30fps_2lane_vc1,
+	&sc231ai_linear_1920x1080_raw10_30fps_2lane,
+	&imx586_linear_3480x2160_raw10_30fps_4lane,
+	&os08c10_linear_3480x2160_raw12_30fps_2lane,
+	&ar0233_linear_1920x1080_raw12_30fps_2lane,
+	&ar0820std_linear_3840x2160_yuv422_30fps_4lane,
+	&sc1336_linear_1280x720_raw10_15fps_2lane,
+	&dummy_sensor_config,
+	&ar0233_linear_1920x1080_raw12_30fps_2lane_vc0,
+	&ar0233_linear_1920x1080_raw12_30fps_2lane_vc1,
+	&ov9782_linear_640x360_raw10_200fps_2lane,
+	&ov9782_linear_1280x720_raw10_120fps_2lane,
 	&imx219_linear_640x480_raw10_30fps_2lane,
 	&imx219_linear_1632x1232_raw10_30fps_2lane,
 	&imx219_linear_1920x1080_raw10_30fps_2lane,
@@ -80,17 +113,18 @@ vp_sensor_config_t *vp_sensor_config_list[] = {
 	&imx219_linear_3264x2464_raw10_21fps_2lane,
 	&ov5647_linear_640x480_raw10_60fps_2lane,
 	&ov5647_linear_1280x960_raw10_30fps_2lane,
-	&ov5647_linear_1920x1080_raw10_30fps_2lane,	
-	&ov5647_linear_2592x1944_raw10_15fps_2lane,	
+	&ov5647_linear_1920x1080_raw10_30fps_2lane,
+	&ov5647_linear_2592x1944_raw10_15fps_2lane,
 	&imx477_linear_1280x960_raw10_120fps_2lane,
 	&imx477_linear_1920x1080_raw12_50fps_2lane,
 	&imx477_linear_2016x1520_raw12_40fps_2lane,
 	&imx477_linear_4000x3000_raw12_10fps_2lane,
-	&sc035hgs_linear_640x480_raw10_30fps_2lane_vc0,
-	&sc035hgs_linear_640x480_raw10_30fps_2lane_vc1,
-	&sc231ai_linear_1920x1080_raw10_30fps_2lane,
-	&imx586_linear_3480x2160_raw10_30fps_4lane,
-	&os08c10_linear_3480x2160_raw12_30fps_2lane,
+	&ov50h40_linear_4096x3072_raw10_30fps_4lane,
+	&ox05b1s_linear_2592x1944_raw10_30fps_4lane,
+	&ox05b1s_linear_2592x1944_raw10_10fps_2lane,
+	&imx415_linear_3480x2160_raw10_60fps_4lane,
+	&sc850sl_linear_3840x2160_raw10_30fps_4lane,
+	&shw3g_linear_2064x1552_raw12_30fps_4lane,
 };
 
 uint32_t vp_get_sensors_list_number() {
@@ -125,6 +159,17 @@ void vp_show_sensors_list_vse_limit(uint32_t width_limit, uint32_t height_limit)
 			i, vp_sensor_config_list[i]->sensor_name,
 			vp_sensor_config_list[i]->config_file);
 	}
+}
+
+
+vp_sensor_config_t *vp_get_sensor_config_by_name(char *sensor_name)
+{
+	for (int i = 0; vp_sensor_config_list[i]->sensor_name != NULL; i++) {
+		if (strcmp(vp_sensor_config_list[i]->sensor_name, sensor_name) == 0) {
+			return vp_sensor_config_list[i];
+		}
+	}
+	return NULL;
 }
 
 // Check system endianness
@@ -213,28 +258,12 @@ static int gpio_set_value(int gpio_number, int value) {
 	return 0;
 }
 
-#define GPIO_PATH_TEMPLATE "/sys/class/gpio/gpio%d"
-#define POLL_INTERVAL_US 10000
-#define MAX_WAIT_TIME_MS 100
-
-static bool wait_for_gpio_export(int gpio_number) {
-    char gpio_path[64];
-    snprintf(gpio_path, sizeof(gpio_path), GPIO_PATH_TEMPLATE, gpio_number);
-
-    for (int i = 0; i < (MAX_WAIT_TIME_MS * 1000) / POLL_INTERVAL_US; i++) {
-		if (access(gpio_path, F_OK) == 0)
-            return true; 
-        usleep(POLL_INTERVAL_US);
-    }
-
-    return false;
-}
-
 static int enable_sensor_pin(int gpio_number, int active)
 {
 	static int last_gpio_number = -1;
+	static int last_active = -1;
 
-    if (gpio_number == last_gpio_number) {
+    if (gpio_number == last_gpio_number && active == last_active ) {
         return 0;
     }
 	
@@ -244,19 +273,11 @@ static int enable_sensor_pin(int gpio_number, int active)
 		return -1;
 	}
 
-	if (!wait_for_gpio_export(gpio_number)) {
-        printf("GPIO directory not created in time for GPIO %d\n", gpio_number);
-        gpio_unexport(gpio_number); 
-        return -1;
-    }
-
 	// Set GPIO direction to output
 	if (gpio_set_direction(gpio_number, "out") != 0) {
 		printf("Failed to set GPIO direction\n");
 		return -1;
 	}
-
-	usleep(30 * 1000);
 
 	/* gpio level should be keep same with sensor driver power_on api */
 
@@ -291,6 +312,7 @@ static int enable_sensor_pin(int gpio_number, int active)
 	}
 
 	last_gpio_number = gpio_number;
+	last_active = active;
 
 	return 0;
 }
@@ -414,8 +436,8 @@ static int32_t vp_i2c_read_reg16_data16(uint32_t bus, uint8_t i2c_addr, uint16_t
 {
 	int32_t ret;
 	struct i2c_rdwr_ioctl_data data;
-	uint8_t sendbuf[32] = {0};
-	uint8_t readbuf[32] = {0};
+	uint8_t sendbuf[2] = {0};
+	uint8_t readbuf[2] = {0};
 	struct i2c_msg msgs[I2C_RDRW_IOCTL_MAX_MSGS] = {0};
 	char filename[20];
 	int file;
@@ -465,8 +487,8 @@ static int32_t vp_i2c_read_reg16_data8(uint32_t bus, uint8_t i2c_addr, uint16_t 
 {
 	int32_t ret;
 	struct i2c_rdwr_ioctl_data data;
-	uint8_t sendbuf[32] = {0};
-	uint8_t readbuf[32] = {0};
+	uint8_t sendbuf[2] = {0};
+	uint8_t readbuf[1] = {0};
 	struct i2c_msg msgs[I2C_RDRW_IOCTL_MAX_MSGS] = {0};
 	char filename[20];
 	int file;
@@ -490,9 +512,9 @@ static int32_t vp_i2c_read_reg16_data8(uint32_t bus, uint8_t i2c_addr, uint16_t 
 	data.msgs[0].flags = 0;
 	data.msgs[0].buf = sendbuf;
 
-	data.msgs[1].len = 2;
+	data.msgs[1].len = 1;
 	data.msgs[1].addr = i2c_addr;
-	data.msgs[1].flags = 1;
+	data.msgs[1].flags = I2C_M_RD;
 	data.msgs[1].buf = readbuf;
 
 	ret = ioctl(file, I2C_RDWR, (uint64_t)&data);
@@ -564,7 +586,6 @@ static int32_t check_sensor_reg_value(vcon_propertie_t vcon_props,
 		} else {
 			printf("WARN: Sensor Name: %s, Expected Chip ID: 0x%02X, Actual Chip ID Read: 0x%02X\n",
 					sensor_config->sensor_name, sensor_config->chip_id & 0x0000FFFF, chip_id);
-			return -1;
 		}
 
 	}
@@ -702,7 +723,6 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 	vp_csi_config_t* csi_config,int sensor_height,int sensor_width,int sensor_fps)
 {
 	int32_t ret = 0, j = 0;
-	uint32_t frequency = 24000000;
 	int32_t sensor_n = 0;
 	int32_t sensor_list[10] = {-1};
 
@@ -717,7 +737,7 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 
 	if(!mclk_is_not_configed) {
 		/* enable mclk */
-		write_mipi_host_freq(mipi_host_index, frequency);
+		write_mipi_host_freq(mipi_host_index, vp_sensor_config_list[mipi_host_index]->vin_attr_ex->mclk_ex_attr.mclk_freq);
 		enable_mipi_host_clock(mipi_host_index, 1);
 	}
 

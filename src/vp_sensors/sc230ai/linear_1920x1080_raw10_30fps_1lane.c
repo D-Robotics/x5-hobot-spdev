@@ -1,23 +1,12 @@
-// Copyright (c) 2024，D-Robotics.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "vp_sensors.h"
 
 #define SENSOR_WIDTH  1920
 #define SENSOR_HEIGHT  1080
 #define SENSOE_FPS 30
 #define RAW10 0x2B
+
+#define SENSOR_TYPE_NV12 8
+#define ALIGN_UP(a, size) (((a) + (size)-1u) & (~((size)-1u)))
 
 static mipi_config_t sc230ai_mipi_config = {
 	.rx_enable = 1,
@@ -57,7 +46,7 @@ static vin_node_attr_t sc230ai_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -118,7 +107,7 @@ static vin_ichn_attr_t sc230ai_vin_ichn_attr = {
 };
 
 static vin_ochn_attr_t sc230ai_vin_ochn_attr = {
-	.ddr_en = 0,
+	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
 		.format = RAW10,
@@ -129,7 +118,7 @@ static vin_ochn_attr_t sc230ai_vin_ochn_attr = {
 };
 
 static isp_attr_t sc230ai_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = 2, // 0: online, 2:offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -152,6 +141,26 @@ static isp_ochn_attr_t sc230ai_isp_ochn_attr = {
 	.bit_width = 8,
 };
 
+static n2d_config_t sc230ai_gpu2d_scale_crop_attr = {
+	.command = N2D_SCALE_CROP,
+	/* scale input */
+	.input_width = {SENSOR_WIDTH},
+	.input_height = {SENSOR_HEIGHT},
+	.input_stride =  {ALIGN_UP(SENSOR_WIDTH, 16)},
+	/* scale output */
+	.output_width = SENSOR_WIDTH,
+	.output_height = SENSOR_HEIGHT,
+	.output_stride = ALIGN_UP(SENSOR_WIDTH, 16),
+
+	.ninputs = 1, // number of inputs
+	.output_format = 8, // // N2D_NV12
+	.crop_x = 0,
+	.crop_y = 0,
+	.crop_width = 0,
+	.crop_height = 0,
+};
+
+
 vp_sensor_config_t sc230ai_linear_1920x1080_raw10_30fps_1lane = {
 	.chip_id_reg = 0x3107,
 	.chip_id = 0xcb34,
@@ -166,4 +175,5 @@ vp_sensor_config_t sc230ai_linear_1920x1080_raw10_30fps_1lane = {
 	.isp_attr      = &sc230ai_isp_attr,
 	.isp_ichn_attr = &sc230ai_isp_ichn_attr,
 	.isp_ochn_attr = &sc230ai_isp_ochn_attr,
+	.gpu2d_scale_crop_attr = &sc230ai_gpu2d_scale_crop_attr,
 };

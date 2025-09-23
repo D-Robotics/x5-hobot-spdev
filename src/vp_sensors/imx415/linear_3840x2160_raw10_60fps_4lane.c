@@ -2,8 +2,13 @@
 
 #define SENSOR_WIDTH  3840
 #define SENSOR_HEIGHT  2160
-#define SENSOE_FPS 30
+#define SENSOE_FPS 60
 #define RAW10 0x2B
+
+#define SCALE_WIDTH  1920
+#define SCALE_HEIGHT  1080
+
+#define ALIGN_UP(a, size) (((a) + (size)-1u) & (~((size)-1u)))
 
 static mipi_config_t imx415_mipi_config = {
 	.rx_enable = 1,
@@ -13,12 +18,12 @@ static mipi_config_t imx415_mipi_config = {
 		.datatype = RAW10,
 		.fps = SENSOE_FPS,
 		.mclk = 24,
-		.mipiclk = 2880,
+		.mipiclk = 8000,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
 		.linelenth = 4400,
 		.framelenth = 2700,
-		.settle = 10,
+		.settle = 15,
 		.channel_num = 1,
 		.channel_sel = {0},
 		.hsdTime = 0,
@@ -51,7 +56,7 @@ static vin_node_attr_t imx415_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -87,7 +92,7 @@ static vin_ochn_attr_t imx415_vin_ochn_attr = {
 };
 
 static isp_attr_t imx415_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = 2, // 0: online, 1: mcm, 类似offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -110,12 +115,31 @@ static isp_ochn_attr_t imx415_isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t imx415_linear_3480x2160_raw10_30fps_4lane = {
+static n2d_config_t imx415_gpu2d_scale_crop_attr = {
+	.command = N2D_SCALE_CROP,
+	/* scale input */
+	.input_width = {SENSOR_WIDTH},
+	.input_height = {SENSOR_HEIGHT},
+	.input_stride =  {ALIGN_UP(SENSOR_WIDTH, 16)},
+	/* scale output */
+	.output_width = SCALE_WIDTH,
+	.output_height = SCALE_HEIGHT,
+	.output_stride = ALIGN_UP(SCALE_WIDTH, 16),
+
+	.ninputs = 1, // number of inputs
+	.output_format = 8, // // N2D_NV12
+	.crop_x = 0,
+	.crop_y = 0,
+	.crop_width = 0,
+	.crop_height = 0,
+};
+
+vp_sensor_config_t imx415_linear_3480x2160_raw10_60fps_4lane = {
 	.chip_id_reg = 0x4001,
 	.chip_id = 0x03,
 	.sensor_i2c_addr_list = {0x1A},
-	.sensor_name = "imx415-30fps-4lane",
-	.config_file = "linear_3840x2160_raw10_30fps_4lane.c",
+	.sensor_name = "imx415-60fps-4lane",
+	.config_file = "linear_3840x2160_raw10_60fps_4lane.c",
 	.camera_config = &imx415_camera_config,
 	.vin_ichn_attr = &imx415_vin_ichn_attr,
 	.vin_node_attr = &imx415_vin_node_attr,
@@ -124,4 +148,5 @@ vp_sensor_config_t imx415_linear_3480x2160_raw10_30fps_4lane = {
 	.isp_attr      = &imx415_isp_attr,
 	.isp_ichn_attr = &imx415_isp_ichn_attr,
 	.isp_ochn_attr = &imx415_isp_ochn_attr,
+	.gpu2d_scale_crop_attr = &imx415_gpu2d_scale_crop_attr,
 };

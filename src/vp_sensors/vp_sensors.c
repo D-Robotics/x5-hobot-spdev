@@ -68,7 +68,7 @@ extern vp_sensor_config_t ov5647_linear_1920x1080_raw10_30fps_2lane;
 extern vp_sensor_config_t ov5647_linear_2592x1944_raw10_15fps_2lane;
 extern vp_sensor_config_t imx477_linear_1280x960_raw10_120fps_2lane;
 extern vp_sensor_config_t imx477_linear_1920x1080_raw12_50fps_2lane;
-extern vp_sensor_config_t imx477_linear_2016x1520_raw12_40fps_2lane;
+extern vp_sensor_config_t imx477_linear_2016x1520_raw12_21fps_2lane;
 extern vp_sensor_config_t imx477_linear_4000x3000_raw12_10fps_2lane;
 extern vp_sensor_config_t ov50h40_linear_4096x3072_raw10_30fps_4lane;
 extern vp_sensor_config_t ox05b1s_linear_2592x1944_raw10_30fps_4lane;
@@ -117,7 +117,7 @@ vp_sensor_config_t *vp_sensor_config_list[] = {
 	&ov5647_linear_2592x1944_raw10_15fps_2lane,
 	&imx477_linear_1280x960_raw10_120fps_2lane,
 	&imx477_linear_1920x1080_raw12_50fps_2lane,
-	&imx477_linear_2016x1520_raw12_40fps_2lane,
+	&imx477_linear_2016x1520_raw12_21fps_2lane,
 	&imx477_linear_4000x3000_raw12_10fps_2lane,
 	&ov50h40_linear_4096x3072_raw10_30fps_4lane,
 	&ox05b1s_linear_2592x1944_raw10_30fps_4lane,
@@ -153,6 +153,13 @@ void vp_show_sensors_list_vse_limit(uint32_t width_limit, uint32_t height_limit)
 		int width_tmp = sensor_config->camera_config->width;
 		int height_tmp = sensor_config->camera_config->height;
 		if (width_tmp * height_tmp < quarter_of_vse_max_resolution) {
+			continue;
+		}
+
+		if((sensor_config->camera_config->width > width_limit &&
+		   sensor_config->camera_config->height < height_limit) ||
+		   (sensor_config->camera_config->width < width_limit &&
+		   sensor_config->camera_config->height > height_limit)) {
 			continue;
 		}
 		printf("index: %d  sensor_name: %-16s \tconfig_file:%s\n",
@@ -751,6 +758,9 @@ vp_sensor_config_t *vp_get_sensor_config_by_mipi_host(int32_t mipi_host_index,
 	if (vcon_props_array[mipi_host_index].status[0] == 'o') { // okay
 		// 检测该vcon上连接的 sensor
 		for (j = 0; j < vp_get_sensors_list_number(); j++) {
+			if(vp_sensor_config_list[j]->camera_config->sensor_mode == DOL2_M){
+				continue;
+			}
 			/*enable gpio_oth, enable camera sensor gpio, maybe pwd/reset gpio */
 			for (int k = 0; k < 8; ++k) {
 				if (vcon_props_array[mipi_host_index].gpio_oth[k] != 0) {

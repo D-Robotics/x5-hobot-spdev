@@ -1,30 +1,16 @@
-// Copyright (c) 2024，D-Robotics.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "vp_sensors.h"
 
 #define SENSOR_WIDTH  1280
 #define SENSOR_HEIGHT  960
-#define SENSOE_FPS 30
-#define RAW12 0x2B
+#define SENSOE_FPS 120
+#define RAW10 0x2B
 
 static mipi_config_t imx477_mipi_config = {
 	.rx_enable = 1,
 	.rx_attr = {
 		.phy = 0,
 		.lane = 2,
-		.datatype = RAW12,
+		.datatype = RAW10,
 		.fps = SENSOE_FPS,
 		.mclk = 24,
 		.mipiclk = 2250,
@@ -47,13 +33,13 @@ static camera_config_t imx477_camera_config = {
 	.addr = 0x1a,
 	.sensor_mode = 1,
 	.fps = SENSOE_FPS,
-	.format = RAW12,
+	.format = RAW10,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
 	.mipi_cfg = &imx477_mipi_config,
-	.calib_lname = "/usr/hobot/bin/imx477_1280x960_tuning.json",
+	.calib_lname = "/usr/hobot/lib/sensor/imx477_1280x960_tuning.json",
 };
 
 static vin_node_attr_t imx477_vin_node_attr = {
@@ -73,7 +59,7 @@ static vin_node_attr_t imx477_vin_node_attr = {
 };
 
 static vin_attr_ex_t vin_attr_ex = {
-	.vin_attr_ex_mask = 0x80,
+	.vin_attr_ex_mask = 0x00,
 	.mclk_ex_attr = {
 		.mclk_freq = 24000000,
 	},
@@ -82,14 +68,14 @@ static vin_attr_ex_t vin_attr_ex = {
 static vin_ichn_attr_t imx477_vin_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
-	.format = RAW12,
+	.format = RAW10,
 };
 
 static vin_ochn_attr_t imx477_vin_ochn_attr = {
 	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
-		.format = RAW12,
+		.format = RAW10,
 		// 硬件 stride 跟格式匹配，通过行像素根据raw数据bit位数计算得来
 		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例raw10，1920 x 2 = 3840
 		.wstride = (SENSOR_WIDTH) * 2,
@@ -111,7 +97,7 @@ static isp_ichn_attr_t imx477_isp_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.fmt = FRM_FMT_RAW,
-	.bit_width = 12,
+	.bit_width = 10,
 };
 
 static isp_ochn_attr_t imx477_isp_ochn_attr = {

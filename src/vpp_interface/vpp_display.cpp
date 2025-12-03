@@ -100,10 +100,8 @@ bool is_drm_available() {
 
 	// 尝试获取 DRM master 权限, 如果失败则表示设备被占用
 	if (ioctl(fd, DRM_IOCTL_SET_MASTER, 0) != 0) {
-		if (errno == EBUSY) {
-			close(fd);
-			return false;  // 设备被占用
-		}
+		close(fd);
+		return false;  // 设备被占用
 	}
 
 	// 设备没有被占用

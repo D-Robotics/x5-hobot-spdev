@@ -1,17 +1,3 @@
-// Copyright (c) 2024，D-Robotics.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "vp_sensors.h"
 
 #define SENSOR_WIDTH  1088
@@ -23,16 +9,16 @@ static mipi_config_t mipi_config = {
 	.rx_enable = 1,
 	.rx_attr = {
 		.phy = 0,
-		.lane = 1,
+		.lane = 2,
 		.datatype = RAW10,
 		.fps = SENSOE_FPS,
-		.mclk = 1,
+		.mclk = 24,
 		.mipiclk = 1200,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 1400,
-		.framelenth = 1500,
-		.settle = 20,
+		.linelenth = 1334,
+		.framelenth = 4500,
+		.settle = 30,
 		.channel_num = 1,
 		.channel_sel = {0},
 	},
@@ -40,7 +26,7 @@ static mipi_config_t mipi_config = {
 
 static camera_config_t camera_config = {
 	.name = "sc132gs",
-	.addr = 0x33,
+	.addr = 0x32,
 	.sensor_mode = 1,
 	.fps = SENSOE_FPS,
 	.format = RAW10,
@@ -49,7 +35,8 @@ static camera_config_t camera_config = {
 	.mipi_cfg = &mipi_config,
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
-	.calib_lname = "disable",
+	.calib_lname = "sc132gs_tuning_f2.0.json",
+	.extra_mode = 1,
 };
 
 static vin_node_attr_t vin_node_attr = {
@@ -152,12 +139,12 @@ static isp_ochn_attr_t isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t sc132gs_linear_1088x1280_raw10_30fps_1lane = {
+vp_sensor_config_t sc132gs_hdr_1088x1280_raw10_30fps_2lane = {
 	.chip_id_reg = 0x3107,
 	.chip_id = 0x0132,
-	.sensor_i2c_addr_list = {0x30, 0x33},
-	.sensor_name = "sc132gs-1280p",
-	.config_file = "linear_1088x1280_raw10_30fps_1lane.c",
+	.sensor_i2c_addr_list = {0x30 , 0x32, 0x33},
+	.sensor_name = "sc132gs-hdr-2lane",
+	.config_file = "hdr_1088x1280_raw10_30fps_2lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,
 	.vin_node_attr = &vin_node_attr,

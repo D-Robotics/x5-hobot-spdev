@@ -1,22 +1,8 @@
-// Copyright (c) 2024，D-Robotics.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "vp_sensors.h"
 
 #define SENSOR_WIDTH  2016
 #define SENSOR_HEIGHT  1520
-#define SENSOE_FPS 40
+#define SENSOE_FPS 21
 #define RAW12 0x2C
 
 static mipi_config_t imx477_mipi_config = {
@@ -53,7 +39,7 @@ static camera_config_t imx477_camera_config = {
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
 	.mipi_cfg = &imx477_mipi_config,
-	.calib_lname = "/usr/hobot/bin/imx477_2016x1520_tuning.json",
+	.calib_lname = "/usr/hobot/lib/sensor/imx477_2016x1520_tuning.json",
 };
 
 static vin_node_attr_t imx477_vin_node_attr = {
@@ -73,7 +59,7 @@ static vin_node_attr_t imx477_vin_node_attr = {
 };
 
 static vin_attr_ex_t vin_attr_ex = {
-	.vin_attr_ex_mask = 0x80,
+	.vin_attr_ex_mask = 0x00,
 	.mclk_ex_attr = {
 		.mclk_freq = 24000000,
 	},
@@ -120,12 +106,12 @@ static isp_ochn_attr_t imx477_isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t imx477_linear_2016x1520_raw12_40fps_2lane = {
+vp_sensor_config_t imx477_linear_2016x1520_raw12_21fps_2lane = {
 	.chip_id_reg = 0x0016,
 	.chip_id = 0x0477,
 	.sensor_i2c_addr_list = {0x1A},
-	.sensor_name = "imx477-2016x1520-40fps",
-	.config_file = "linear_2016x1520_raw12_40fps_2lane.c",
+	.sensor_name = "imx477-2016x1520-21fps",
+	.config_file = "linear_2016x1520_raw12_21fps_2lane.c",
 	.camera_config = &imx477_camera_config,
 	.vin_ichn_attr = &imx477_vin_ichn_attr,
 	.vin_node_attr = &imx477_vin_node_attr,

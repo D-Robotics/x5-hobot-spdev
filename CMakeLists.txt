@@ -41,7 +41,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vp_wrap/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vpp_interface
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/hobot-dnn/debian/usr/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/hobot-dnn/x5/usr/include
     $ENV{SYSROOT_DIR}/usr/include/aarch64-linux-gnu
     $ENV{SYSROOT_DIR}/usr/include/drm
 )
@@ -49,7 +49,7 @@ include_directories(
 link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/lib
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/aarch64-linux-gnu
-    ${CMAKE_CURRENT_SOURCE_DIR}/hobot-dnn/debian/usr/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/hobot-dnn/x5/usr/lib
     $ENV{SYSROOT_DIR}/usr/lib/aarch64-linux-gnu
     $ENV{SYSROOT_DIR}/usr/lib/aarch64-none-linux-gnu
 )

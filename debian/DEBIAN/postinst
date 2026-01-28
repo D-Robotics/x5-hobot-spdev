@@ -2,6 +2,8 @@
 
 pip3 install /usr/lib/hobot_spdev/hobot_dnn*.whl
 pip3 install /usr/lib/hobot_spdev/hobot_vio*.whl
+pip3 install /usr/lib/hobot_spdev/hbm_runtime*.whl
+pip3 install /usr/lib/hobot_spdev/scipy-1.10.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
 
 ldconfig
 

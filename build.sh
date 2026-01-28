@@ -137,6 +137,20 @@ function cmake_build() {
 	cd "${BUILD_DIR}/python_hobot_dnn_rdkx5"
 	python3 setup_hobot_dnn_rdkx5.py bdist_wheel
 
+
+	# make hbm_runtime
+	mkdir -p "${BUILD_DIR}"/python_hbm_runtime
+	cp -arf "${ALL_PROJECT_DIR}/python/hbm_runtime" "${BUILD_DIR}"/python_hbm_runtime/hbm_runtime
+	cp -arf "${ALL_PROJECT_DIR}/python/setup_hbm_runtime.py" "${BUILD_DIR}"/python_hbm_runtime
+	cd "${BUILD_DIR}/python_hbm_runtime"
+	python3 setup_hbm_runtime.py bdist_wheel
+
+	# install scipy for hbm_runtime example
+	cp -arf "${ALL_PROJECT_DIR}/python/3rd_whl/"*.whl "${OUTPUT_DIR}"
+
+
+	cp "${BUILD_DIR}/python_hbm_runtime/dist/"*.whl "${OUTPUT_DIR}"
+
 	mkdir -p "${OUTPUT_DIR}/include"
 	cp "${SCRIPTS_DIR}/src/clang/"*.h "${OUTPUT_DIR}/include"
 }

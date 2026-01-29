@@ -76,7 +76,8 @@ class VPPCamera :public VPPModule
 	 */
 	int32_t OpenCamera(const int pipe_id, const int video_index = -1,
 			int chn_num = 0, int *width = NULL, int *height = NULL,
-		  vp_sensors_parameters* param = NULL);
+			vp_sensors_parameters* param = NULL,
+			int32_t *crop_x = NULL, int32_t *crop_y = NULL, int32_t *crop_width = NULL, int32_t *crop_height = NULL);
 
 		/**
 	 * @brief 开启VSE
@@ -91,6 +92,10 @@ class VPPCamera :public VPPModule
 	 * @param [in] crop_width    裁剪宽
 	 * @param [in] crop_height   裁剪高
 	 * @param [in] rotate      旋转角度
+	 * @param [in] crop_x        裁剪坐标x
+	 * @param [in] crop_y        裁剪坐标y
+	 * @param [in] crop_width    裁剪宽
+	 * @param [in] crop_height   裁剪高
 	 *
 	 * @retval 0      成功
 	 * @retval -1     失败
@@ -233,7 +238,8 @@ class VPPCamera :public VPPModule
 	int32_t CamInitParam(vp_vflow_contex_t *vp_vflow_contex,
 			const int pipe_id, const int video_index,
 			int chn_num, int *width, int *height,
-			vp_sensors_parameters *parameters);
+			vp_sensors_parameters *parameters,
+			int *crop_x, int *crop_y, int *crop_width, int *crop_height);
 
 	/**
 	 * @brief 初始化 VSE 各通道的参数

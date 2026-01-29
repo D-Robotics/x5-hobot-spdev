@@ -220,7 +220,8 @@ namespace spdev
 	int32_t VPPCamera::CamInitParam(vp_vflow_contex_t *vp_vflow_contex,
 					const int pipe_id, const int video_index,
 					int chn_num, int *width, int *height,
-					vp_sensors_parameters *parameters)
+					vp_sensors_parameters *parameters,
+					int *crop_x, int *crop_y, int *crop_width, int *crop_height)
 	{
 		int i = 0;
 		int ret = 0;
@@ -313,19 +314,41 @@ namespace spdev
 				SC_LOGE("Invalid size:%dx%d\n", width[i], height[i]);
 				return -1;
 			}
-			vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
-			vse_config->vse_ochn_attr[vse_chn].roi.x = 0;
-			vse_config->vse_ochn_attr[vse_chn].roi.y = 0;
-			vse_config->vse_ochn_attr[vse_chn].roi.w = input_width;
-			vse_config->vse_ochn_attr[vse_chn].roi.h = input_height;
-			vse_config->vse_ochn_attr[vse_chn].target_w = width[i];
-			vse_config->vse_ochn_attr[vse_chn].target_h = height[i];
-			vse_config->vse_ochn_attr[vse_chn].fmt = FRM_FMT_NV12;
-			vse_config->vse_ochn_attr[vse_chn].bit_width = 8;
+			if (crop_x != NULL && crop_y != NULL && crop_width != NULL && crop_height != NULL
+			&& (crop_x[i] > 0 || crop_y[i] > 0 || crop_width[i] > 0 || crop_height[i] > 0)) {
+				vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
+				vse_config->vse_ochn_attr[vse_chn].roi.x = crop_x[i];
+				vse_config->vse_ochn_attr[vse_chn].roi.y = crop_y[i];
+				vse_config->vse_ochn_attr[vse_chn].roi.w = crop_width[i];
+				vse_config->vse_ochn_attr[vse_chn].roi.h = crop_height[i];
+				vse_config->vse_ochn_attr[vse_chn].target_w = width[i];
+				vse_config->vse_ochn_attr[vse_chn].target_h = height[i];
+				vse_config->vse_ochn_attr[vse_chn].fmt = FRM_FMT_NV12;
+				vse_config->vse_ochn_attr[vse_chn].bit_width = 8;
+			} else  {
+				vse_config->vse_ochn_attr[vse_chn].chn_en = CAM_TRUE;
+				vse_config->vse_ochn_attr[vse_chn].roi.x = 0;
+				vse_config->vse_ochn_attr[vse_chn].roi.y = 0;
+				vse_config->vse_ochn_attr[vse_chn].roi.w = input_width;
+				vse_config->vse_ochn_attr[vse_chn].roi.h = input_height;
+				vse_config->vse_ochn_attr[vse_chn].target_w = width[i];
+				vse_config->vse_ochn_attr[vse_chn].target_h = height[i];
+				vse_config->vse_ochn_attr[vse_chn].fmt = FRM_FMT_NV12;
+				vse_config->vse_ochn_attr[vse_chn].bit_width = 8;
+
+			}
 			vse_chn_en |= 1 << vse_chn;
 			SC_LOGI("Setting VSE channel-%d: input_width:%d, input_height:%d, dst_w:%d, dst_h:%d",
 				vse_chn,
 				input_width, input_height, width[i], height[i]);
+
+			SC_LOGI("ROI: x:%d, y:%d, w:%d, h:%d, target_w:%d, target_h:%d",
+				vse_config->vse_ochn_attr[vse_chn].roi.x,
+				vse_config->vse_ochn_attr[vse_chn].roi.y,
+				vse_config->vse_ochn_attr[vse_chn].roi.w,
+				vse_config->vse_ochn_attr[vse_chn].roi.h,
+				vse_config->vse_ochn_attr[vse_chn].target_w,
+				vse_config->vse_ochn_attr[vse_chn].target_h);
 		}
 
 		m_width = input_width;
@@ -435,7 +458,8 @@ namespace spdev
 								  const int32_t video_index,
 								  int32_t chn_num,
 								  int32_t *width, int32_t *height,
-								  vp_sensors_parameters *parameters)
+								  vp_sensors_parameters *parameters,
+								  int32_t *crop_x, int32_t *crop_y, int32_t *crop_width, int32_t *crop_height)
 	{
 		int32_t ret = 0;
 
@@ -490,7 +514,7 @@ namespace spdev
 			vp_vflow_contex_t *vp_vflow_contex = &m_vp_vflow_context;
 			// TODO: 根据 video_index 和 chn_num 完成sensor的探测、初始化、开流
 			ret = CamInitParam(vp_vflow_contex, pipe_id, video_index, chn_num,
-				width, height, parameters);
+				width, height, parameters, crop_x, crop_y, crop_width, crop_height);
 			if (ret != 0){
 				SC_LOGE("CamInitParam failed error(%d)", ret);
 				return -1;

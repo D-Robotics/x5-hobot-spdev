@@ -47,6 +47,11 @@ extern "C"
         const int32_t video_index, int32_t chn_num,
         sp_sensors_parameters *parameters,
         int32_t *input_width, int32_t *input_height);
+    int32_t sp_open_camera_v3(void *obj, const int32_t pipe_id,
+        const int32_t video_index, int32_t chn_num,
+        sp_sensors_parameters *parameters,
+        int32_t *input_width, int32_t *input_height,
+        int32_t *crop_x, int32_t *crop_y, int32_t *crop_width, int32_t *crop_height, int32_t *rotate);
     int32_t sp_open_vps(void *obj, const int32_t pipe_id, int32_t chn_num, int32_t proc_mode,
                         int32_t src_width, int32_t src_height, int32_t *dst_width, int32_t *dst_height,
                         int32_t *crop_x, int32_t *crop_y, int32_t *crop_width, int32_t *crop_height, int32_t *rotate);

@@ -273,29 +273,37 @@ extern "C"
 			return Py_BuildValue("i", -1);
 		}
 
-		int pipe_id, video_index, fps = 30, chn_num = 0;
+		int pipe_id, video_index, fps = 30, chn_num = 0, w_num = 0, h_num = 0;
 		int raw_height = -1, raw_width = -1;
-		int width[VSE_MAX_CHN_NUM], height[VSE_MAX_CHN_NUM];
+		int crop_x[VSE_MAX_CHN_NUM] = {0}, crop_y[VSE_MAX_CHN_NUM] = {0};
+		int crop_width[VSE_MAX_CHN_NUM] = {0}, crop_height[VSE_MAX_CHN_NUM] = {0};
+		int width[VSE_MAX_CHN_NUM] = {0}, height[VSE_MAX_CHN_NUM] = {0};
 		vp_sensors_parameters sensors_parameters;
-		PyObject *width_obj = NULL, *height_obj = NULL, *size_obj = NULL;
+		PyObject *width_obj = NULL, *height_obj = NULL, *crop_rect_obj = NULL;
 		VPPCamera *cam = (VPPCamera *)self->pobj;
 		static char *kwlist[] = {(char *)"pipe_id", (char *)"video_index",
 			(char *)"fps", (char *)"width", (char *)"height",
-			(char *)"raw_height",(char *)"raw_width",NULL};
+			(char *)"raw_height",(char *)"raw_width",(char *)"crop_rect",NULL};
 
-		if (!PyArg_ParseTupleAndKeywords(args, kw, "ii|iOOii",
+		if (!PyArg_ParseTupleAndKeywords(args, kw, "ii|iOOiiO",
 			kwlist, &pipe_id, &video_index, &fps,
-			&width_obj, &height_obj, &raw_height, &raw_width))
+			&width_obj, &height_obj, &raw_height, &raw_width, &crop_rect_obj))
 			return Py_BuildValue("i", -1);
 		sensors_parameters.fps = fps;
 		sensors_parameters.raw_height = raw_height;
 		sensors_parameters.raw_width = raw_width;
-		if (size_obj != NULL) {
-			chn_num = py_obj_to_size(size_obj, width, height);
-		} else {
-			chn_num = py_obj_to_array(width_obj, width);
-			chn_num = py_obj_to_array(height_obj, height);
+
+		w_num = py_obj_to_array(width_obj, width);
+		h_num = py_obj_to_array(height_obj, height);
+
+		if (w_num < 0 || h_num < 0 || w_num != h_num) {
+			PyErr_SetString(PyExc_ValueError,
+				"width and height must have same length");
+			return Py_BuildValue("i", -1);
 		}
+
+		chn_num = w_num;
+
 		if (chn_num < 0) {
 			PRINT("Invalid param\n");
 			return Py_BuildValue("i", -1);
@@ -306,9 +314,13 @@ extern "C"
 			height[chn_num] = 0;
 			chn_num++;
 		}
+		if (crop_rect_obj && crop_rect_obj != Py_None) {
+			py_obj_to_rect(crop_rect_obj, crop_x, crop_y, crop_width, crop_height);
+		}
+
 		return Py_BuildValue("i",
 			cam->OpenCamera(pipe_id, video_index, chn_num, width, height,
-				&sensors_parameters));
+				&sensors_parameters,crop_x,crop_y,crop_width,crop_height));
 	}
 
 	PyObject *Camera_open_vps(libsppydev_Object *self, PyObject *args, PyObject *kw)

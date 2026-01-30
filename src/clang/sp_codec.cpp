@@ -137,6 +137,7 @@ int32_t sp_start_decode(void *decoder_object, const char *stream_file, int32_t v
 int sp_decoder_get_image(void *decoder_object, char *image_buffer)
 {
     size_t offset = 0;
+    size_t plane_size = 0;
 
     if (decoder_object != NULL && image_buffer != NULL)
     {
@@ -144,13 +145,11 @@ int sp_decoder_get_image(void *decoder_object, char *image_buffer)
         ImageFrame frame = {0};
         if (decoder_obj->GetImageFrame(&frame) == 0)
         {
-            // vp_normal_buf_info_print(&frame);
-            // vp_codec_print_media_codec_output_buffer_info(&frame);
+            // Copy data of the original resolution
+            plane_size = decoder_obj->getWidth() * decoder_obj->getHeight();
 
-            for (int i = 0; i < frame.plane_count; ++i) {
-                memcpy(image_buffer + offset, frame.data[i], frame.data_size[i]);
-                offset += frame.data_size[i];
-            }
+            memcpy(image_buffer, frame.data[0], plane_size);
+            memcpy(image_buffer + plane_size, frame.data[1], plane_size / 2);
 
             decoder_obj->ReturnImageFrame(&frame);
             return 0;

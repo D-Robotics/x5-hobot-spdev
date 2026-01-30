@@ -190,6 +190,10 @@ namespace spdev
 		int32_t m_width = 1920;	 // input width
 		int32_t m_height = 1080; // input height
 
+	public:
+		int32_t getWidth() const { return m_width; }
+		int32_t getHeight() const { return m_height; }
+
 	private:
 		int32_t m_prev_module_chn = 0;
 		VPPModule *m_prev_module = NULL;

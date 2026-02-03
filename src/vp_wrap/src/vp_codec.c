@@ -795,9 +795,12 @@ int32_t vp_codec_set_input(media_codec_context_t *context, ImageFrame *frame, in
 
 	buffer->type = (context->encoder) ? MC_VIDEO_FRAME_BUFFER : MC_VIDEO_STREAM_BUFFER;
 	ret = hb_mm_mc_dequeue_input_buffer(context, buffer, 2000);
-	if (ret != 0)
+	if (ret != 0 && ret != HB_MEDIA_ERR_WAIT_TIMEOUT) // -268435443
 	{
 		SC_LOGE("hb_mm_mc_dequeue_input_buffer failed ret = %d", ret);
+		return -1;
+	} else if (ret == HB_MEDIA_ERR_WAIT_TIMEOUT) {
+		SC_LOGD("hb_mm_mc_dequeue_output_buffer timed out (possibly normal exit due to lack of data)");
 		return -1;
 	}
 

@@ -21,7 +21,11 @@ else ()
 endif ()
 
 list(APPEND CMAKE_C_FLAGS "-Wall -Wno-unknown-pragmas -fPIC -fexceptions ")
+set(SPDEV_SYSROOT_LIB "$ENV{SYSROOT_DIR}/usr/lib/aarch64-linux-gnu")
 list(APPEND CMAKE_C_FLAGS "--sysroot=$ENV{SYSROOT_DIR} ")
+list(APPEND CMAKE_C_FLAGS "-B${SPDEV_SYSROOT_LIB} ")
+list(APPEND CMAKE_EXE_LINKER_FLAGS "--sysroot=$ENV{SYSROOT_DIR} -B${SPDEV_SYSROOT_LIB} -Wl,-rpath-link,${SPDEV_SYSROOT_LIB}")
+list(APPEND CMAKE_SHARED_LINKER_FLAGS "--sysroot=$ENV{SYSROOT_DIR} -B${SPDEV_SYSROOT_LIB} -Wl,-rpath-link,${SPDEV_SYSROOT_LIB}")
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     list(APPEND CMAKE_C_FLAGS "-march=armv8-a -mcpu=cortex-a53 -O3 ")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC ")
@@ -67,7 +71,7 @@ if ("${SOC}" STREQUAL "X5")
     swresample ffmedia gdcbin cjson alog
     dnn cnn_intf hbrt_bayes_aarch64
     m EGL GL X11
-    ssl crypto z dl rt pthread python3.10)
+    ssl crypto z dl rt pthread python3.12)
 endif()
 
 # add spdev include path

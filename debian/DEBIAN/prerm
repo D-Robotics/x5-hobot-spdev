@@ -1,5 +1,9 @@
 #!/bin/bash
 
-pip3 uninstall -y hobot_vio
-pip3 uninstall -y hobot-dnn
+set -e
+
+PIP_OPTS="--break-system-packages"
+
+pip3 uninstall -y ${PIP_OPTS} hobot_vio hobot_dnn hbm_runtime || true
+
 exit 0

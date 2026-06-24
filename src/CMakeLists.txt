@@ -26,10 +26,10 @@ add_library(${HBSPDEV_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${HBSPDEV_NAME} ${HB_SDK_LIB} ${BASE_LIBRARIES})
 
 include_directories(
-    $ENV{SYSROOT_DIR}/usr/include/aarch64-linux-gnu/python3.10
-    $ENV{SYSROOT_DIR}/usr/include/python3.10
+    $ENV{SYSROOT_DIR}/usr/include/aarch64-linux-gnu/python3.12
+    $ENV{SYSROOT_DIR}/usr/include/python3.12
     $ENV{SYSROOT_DIR}/usr/include
-    $ENV{SYSROOT_DIR}/usr/local/lib/python3.10/dist-packages/numpy/core/include
+    $ENV{SYSROOT_DIR}/usr/lib/python3/dist-packages/numpy/core/include
 )
 
 # make libsrcampy.so

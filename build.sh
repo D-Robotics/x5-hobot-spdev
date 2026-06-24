@@ -23,7 +23,7 @@ ARCH="arm64"
 MODE="release"
 BIT="64bit"
 
-export CROSS_COMPILE=${CROSS_COMPILE:-/opt/gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-}
+export CROSS_COMPILE=${CROSS_COMPILE:-/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-}
 
 # Set default output paths
 SYSROOT_DIR="${SYSROOT_DIR:-$(realpath ../../deploy)/rootfs}"

@@ -28,7 +28,7 @@ arch="aarch64"
 classifiers = ['Operating System :: POSIX :: Linux',
                'License :: OSI Approved :: MIT License',
                'Intended Audience :: Developers',
-               'Programming Language :: Python :: 3.10',
+               'Programming Language :: Python :: 3.12',
                'Topic :: Software Development',
                'Topic :: System :: Hardware']
 

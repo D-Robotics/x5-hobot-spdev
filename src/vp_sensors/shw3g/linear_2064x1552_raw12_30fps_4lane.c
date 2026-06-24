@@ -18,8 +18,8 @@ static mipi_config_t shw3g_mipi_config = {
 		.linelenth = 860,
 		.framelenth = 2877,
 		.settle = 0,
-		.channel_num = 1,
-		.channel_sel = {0},
+		.channel_num = 2,
+		.channel_sel = {0,1},
 	},
 	.rx_ex_mask = 0x40,
 	.rx_attr_ex = {
@@ -53,7 +53,7 @@ static vin_node_attr_t shw3g_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -126,7 +126,7 @@ static vin_ochn_attr_t shw3g_vin_ochn_attr = {
 };
 
 static isp_attr_t shw3g_isp_attr = {
-	.input_mode = 2, // 0: online, 2:offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -140,7 +140,7 @@ static isp_ichn_attr_t shw3g_isp_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.fmt = FRM_FMT_RAW,
-	.bit_width = 10,
+	.bit_width = 12,
 };
 
 static isp_ochn_attr_t shw3g_isp_ochn_attr = {
@@ -155,6 +155,7 @@ vp_sensor_config_t shw3g_linear_2064x1552_raw12_30fps_4lane = {
 	.sensor_type = SENSOR_TYPE_GMSL_RAW,
 	.sensor_i2c_addr_list = {0x36},
 	.sensor_name = "shw3g-30fps",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_2064x1552_raw12_30fps_4lane.c",
 	.camera_config = &shw3g_camera_config,
 	.vin_ichn_attr = &shw3g_vin_ichn_attr,

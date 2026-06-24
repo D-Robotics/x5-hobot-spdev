@@ -46,7 +46,7 @@ static vin_node_attr_t os08c10_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -82,7 +82,7 @@ static vin_ochn_attr_t os08c10_vin_ochn_attr = {
 };
 
 static isp_attr_t os08c10_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -110,6 +110,7 @@ vp_sensor_config_t os08c10_linear_3480x2160_raw12_30fps_2lane = {
 	.chip_id = 0x53,
 	.sensor_i2c_addr_list = {0x21},
 	.sensor_name = "os08c10-30fps-2lane",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_3840x2160_raw12_30fps_2lane.c",
 	.camera_config = &os08c10_camera_config,
 	.vin_ichn_attr = &os08c10_vin_ichn_attr,

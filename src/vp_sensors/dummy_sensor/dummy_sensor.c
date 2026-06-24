@@ -27,7 +27,13 @@ static camera_config_t camera_config = {
 		"\"tuning_data\": {"
 			"\"enable\": 1,"
 			"\"bayer_start\": 3,"  /* BAYER_START_B */
-			"\"bayer_pattern\": 0" /* BAYER_PATTERN_RGGB */
+			"\"bayer_pattern\": 0," /* BAYER_PATTERN_RGGB */
+			"\"lines_per_second\": 33750,"
+			"\"exposure_time_max\": 1012,"
+			"\"exposure_time_min\": 1,"
+			"\"exposure_time_long_max\": 2242,"
+			"\"analog_gain_max\": 251,"
+			"\"digital_gain_max\": 0"
 		"}"
 	"}",
 	.end_flag = CAMERA_CONFIG_END_FLAG,
@@ -38,7 +44,7 @@ static vin_node_attr_t vin_node_attr = {
 		.mipi_rx = 1,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 0,
 			.set_init_frame_id = 0,
@@ -73,7 +79,7 @@ static vin_attr_ex_t vin_attr_ex = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = 2, // 0: online, 1: mcm, 类似offline, 2: Offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,

@@ -50,7 +50,7 @@ static vin_node_attr_t imx586_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -86,7 +86,7 @@ static vin_ochn_attr_t imx586_vin_ochn_attr = {
 };
 
 static isp_attr_t imx586_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -114,6 +114,7 @@ vp_sensor_config_t imx586_linear_3480x2160_raw10_30fps_4lane = {
 	.chip_id = 0x0586,
 	.sensor_i2c_addr_list = {0x1A},
 	.sensor_name = "imx586-30fps-4lane",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_3840x2160_raw10_30fps_4lane.c",
 	.camera_config = &imx586_camera_config,
 	.vin_ichn_attr = &imx586_vin_ichn_attr,

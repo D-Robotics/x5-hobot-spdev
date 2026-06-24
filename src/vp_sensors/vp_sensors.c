@@ -1,17 +1,3 @@
-// Copyright (c) 2024，D-Robotics.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "vp_sensors.h"
 
 #include <stdio.h>
@@ -66,6 +52,8 @@ extern vp_sensor_config_t ov5647_linear_640x480_raw10_60fps_2lane;
 extern vp_sensor_config_t ov5647_linear_1280x960_raw10_30fps_2lane;
 extern vp_sensor_config_t ov5647_linear_1920x1080_raw10_30fps_2lane;
 extern vp_sensor_config_t ov5647_linear_2592x1944_raw10_15fps_2lane;
+extern vp_sensor_config_t imx678_linear_3840x2160_raw12_30fps_4lane;
+extern vp_sensor_config_t imx678_dol2_3840x2160_raw12_30fps_4lane;
 extern vp_sensor_config_t imx477_linear_1280x960_raw10_120fps_2lane;
 extern vp_sensor_config_t imx477_linear_1920x1080_raw12_50fps_2lane;
 extern vp_sensor_config_t imx477_linear_2016x1520_raw12_21fps_2lane;
@@ -76,6 +64,18 @@ extern vp_sensor_config_t ox05b1s_linear_2592x1944_raw10_10fps_2lane;
 extern vp_sensor_config_t imx415_linear_3480x2160_raw10_60fps_4lane;
 extern vp_sensor_config_t sc850sl_linear_3840x2160_raw10_30fps_4lane;
 extern vp_sensor_config_t shw3g_linear_2064x1552_raw12_30fps_4lane;
+extern vp_sensor_config_t shw3g_linear_2064x1552_raw12_30fps_4lane_vc1;
+extern vp_sensor_config_t sc235hai_linear_1920x1080_raw10_30fps_2lane;
+extern vp_sensor_config_t cv4006_linear_1280x720_raw10_60fps_2lane;
+extern vp_sensor_config_t ov50h40_linear_3840x2160_raw10_30fps_4lane;
+extern vp_sensor_config_t ov50h40_linear_4096x3072_raw14_30fps_4lane;
+extern vp_sensor_config_t sc132gs_linear_1088x1280_raw10_30fps_slave_1lane_right;
+extern vp_sensor_config_t sc132gs_linear_1088x1280_raw10_30fps_slave_1lane_left;
+extern vp_sensor_config_t sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc0;
+extern vp_sensor_config_t sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc1;
+extern vp_sensor_config_t sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc2;
+extern vp_sensor_config_t sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc3;
+extern vp_sensor_config_t imx415_dol2_3840x2160_raw10_30fps_4lane;
 
 vp_sensor_config_t *vp_sensor_config_list[] = {
 	&sc1330t_linear_1280x960_raw10_30fps_1lane,
@@ -115,6 +115,8 @@ vp_sensor_config_t *vp_sensor_config_list[] = {
 	&ov5647_linear_1280x960_raw10_30fps_2lane,
 	&ov5647_linear_1920x1080_raw10_30fps_2lane,
 	&ov5647_linear_2592x1944_raw10_15fps_2lane,
+	&imx678_linear_3840x2160_raw12_30fps_4lane,
+	&imx678_dol2_3840x2160_raw12_30fps_4lane,
 	&imx477_linear_1280x960_raw10_120fps_2lane,
 	&imx477_linear_1920x1080_raw12_50fps_2lane,
 	&imx477_linear_2016x1520_raw12_21fps_2lane,
@@ -125,12 +127,43 @@ vp_sensor_config_t *vp_sensor_config_list[] = {
 	&imx415_linear_3480x2160_raw10_60fps_4lane,
 	&sc850sl_linear_3840x2160_raw10_30fps_4lane,
 	&shw3g_linear_2064x1552_raw12_30fps_4lane,
+	&shw3g_linear_2064x1552_raw12_30fps_4lane_vc1,
+	&sc235hai_linear_1920x1080_raw10_30fps_2lane,
+	&cv4006_linear_1280x720_raw10_60fps_2lane,
+	&ov50h40_linear_3840x2160_raw10_30fps_4lane,
+	&ov50h40_linear_4096x3072_raw14_30fps_4lane,
+	&sc132gs_linear_1088x1280_raw10_30fps_slave_1lane_right,
+	&sc132gs_linear_1088x1280_raw10_30fps_slave_1lane_left,
+	&sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc0,
+	&sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc1,
+	&sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc2,
+	&sc132gsstd_linear_1088x1280_raw10_10fps_1lane_vc3,
+	&imx415_dol2_3840x2160_raw10_30fps_4lane,
 };
-
 uint32_t vp_get_sensors_list_number() {
 	return sizeof(vp_sensor_config_list) / sizeof(vp_sensor_config_list[0]);
 }
 
+int vp_get_sensor_info_by_name(const char *sensor_name, int *width , int *height, int *fps){
+
+	int found_index = -1;
+	uint32_t sensor_count = vp_get_sensors_list_number();
+	for (int i = 0; i < sensor_count; i++){
+		vp_sensor_config_t* sensor_config = vp_sensor_config_list[i];
+		if(strcmp(sensor_config->sensor_name, sensor_name) == 0){
+			found_index = i;
+			break;
+		}
+	}
+	if(found_index == -1){
+		return -1;
+	}
+	*width = vp_sensor_config_list[found_index]->camera_config->width;
+	*height = vp_sensor_config_list[found_index]->camera_config->height;
+	*fps = vp_sensor_config_list[found_index]->camera_config->fps;
+
+	return 0;
+}
 void vp_show_sensors_list() {
 	int num = 0;
 
@@ -157,9 +190,9 @@ void vp_show_sensors_list_vse_limit(uint32_t width_limit, uint32_t height_limit)
 		}
 
 		if((sensor_config->camera_config->width > width_limit &&
-		   sensor_config->camera_config->height < height_limit) ||
-		   (sensor_config->camera_config->width < width_limit &&
-		   sensor_config->camera_config->height > height_limit)) {
+			sensor_config->camera_config->height < height_limit) ||
+			(sensor_config->camera_config->width < width_limit &&
+			sensor_config->camera_config->height > height_limit)) {
 			continue;
 		}
 		printf("index: %d  sensor_name: %-16s \tconfig_file:%s\n",
@@ -171,7 +204,9 @@ void vp_show_sensors_list_vse_limit(uint32_t width_limit, uint32_t height_limit)
 
 vp_sensor_config_t *vp_get_sensor_config_by_name(char *sensor_name)
 {
-	for (int i = 0; vp_sensor_config_list[i]->sensor_name != NULL; i++) {
+	uint32_t sensor_count = vp_get_sensors_list_number();
+
+	for (uint32_t i = 0; i < sensor_count; i++) {
 		if (strcmp(vp_sensor_config_list[i]->sensor_name, sensor_name) == 0) {
 			return vp_sensor_config_list[i];
 		}
@@ -539,7 +574,11 @@ static int32_t vp_i2c_read_reg16_data8(uint32_t bus, uint8_t i2c_addr, uint16_t 
 	return 0;
 }
 
-static int32_t read_chip_id(vcon_propertie_t vcon_props, vp_sensor_config_t *sensor_config, uint32_t addr, int32_t *chip_id) {
+static int32_t read_chip_id(vcon_propertie_t vcon_props, vp_sensor_config_t *sensor_config, uint32_t addr, int32_t *chip_id)
+{
+	if (sensor_config->read_chip_id_cb != NULL) {
+		return sensor_config->read_chip_id_cb(vcon_props, (void*)sensor_config, addr, chip_id);
+	}
 
 	if(sensor_config->chip_id >> 8 == 0) {
 		// 读取 8 位 chip ID
@@ -574,6 +613,8 @@ static int32_t check_sensor_reg_value(vcon_propertie_t vcon_props,
 		if (sensor_config->sensor_i2c_addr_list[i] == 0) {
 			sensor_config->sensor_i2c_addr_list[i] = addr;
 			break;
+		}else if (sensor_config->sensor_i2c_addr_list[i] == addr) {
+			break;
 		}
 	}
 
@@ -591,8 +632,8 @@ static int32_t check_sensor_reg_value(vcon_propertie_t vcon_props,
 			sensor_config->vin_node_attr->cim_attr.mipi_rx = vcon_props.rx_phy[1];
 			return 0;
 		} else {
-			printf("WARN: Sensor Name: %s, Expected Chip ID: 0x%02X, Actual Chip ID Read: 0x%02X\n",
-					sensor_config->sensor_name, sensor_config->chip_id & 0x0000FFFF, chip_id);
+			printf("WARN: Sensor Name: %s, Addr: 0x%02x Expected Chip ID: 0x%02X, Actual Chip ID Read: 0x%02X\n",
+					sensor_config->sensor_name, addr, sensor_config->chip_id & 0x0000FFFF, chip_id);
 		}
 
 	}
@@ -709,6 +750,27 @@ int get_board_id(char *data, size_t size)
 	}
 
 	return 0;
+}
+
+static void should_used_csi(int *is_need_used_csi)
+{
+	char board_id[16];
+	int ret = get_board_id(board_id, sizeof(board_id));
+
+	if (ret == 0) {
+		if (strncmp(board_id, "201", 3) == 0) {
+			printf("[INFO] board_id is %s, so skip csi test for index 1\n", board_id);
+			is_need_used_csi[1] = false;// board 201 not use csi1
+		}
+		if (strncmp(board_id, "0x03", 4) == 0 || strncmp(board_id, "0x05", 4) == 0 || 
+			board_id[0] == '3' || board_id[0] == '5') {
+			printf("[INFO] RDK board_id is %s, so skip csi test for index 1 and index 3\n", board_id);
+			is_need_used_csi[1] = false;
+			is_need_used_csi[3] = false;
+		}
+	} else {
+		printf("read board_id file failed, so do not skip csi.\n");
+	}
 }
 
 static int32_t vp_sensor_mipi_host_mclk_is_not_configed(int csi_index){

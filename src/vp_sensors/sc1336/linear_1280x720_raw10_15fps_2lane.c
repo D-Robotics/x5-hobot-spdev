@@ -44,7 +44,7 @@ static vin_node_attr_t vin_node_attr = {
 		.vc_index = 0,
 		.ipi_channel = 1,
 		// SIF online/offline ISP
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -82,7 +82,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	// 使用Linear模式
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
@@ -110,6 +110,7 @@ vp_sensor_config_t sc1336_linear_1280x720_raw10_15fps_2lane = {
 	.chip_id_reg = 0x3107,
 	.chip_id = 0xca3f,
 	.sensor_name = "sc1336",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_1280x720_raw10_15fps_2lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,

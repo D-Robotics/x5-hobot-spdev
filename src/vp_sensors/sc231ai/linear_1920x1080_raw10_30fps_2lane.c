@@ -43,7 +43,7 @@ static vin_node_attr_t sc231ai_vin_node_attr = {
 		.mipi_rx = 3,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -79,7 +79,7 @@ static vin_ochn_attr_t sc231ai_vin_ochn_attr = {
 };
 
 static isp_attr_t sc231ai_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -107,6 +107,7 @@ vp_sensor_config_t sc231ai_linear_1920x1080_raw10_30fps_2lane = {
 	.chip_id = 0xcb6a,
 	.sensor_i2c_addr_list = {0x30, 0x32},
 	.sensor_name = "sc231ai-30fps",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_1920x1080_raw10_30fps_2lane.c",
 	.camera_config = &sc231ai_camera_config,
 	.vin_ichn_attr = &sc231ai_vin_ichn_attr,

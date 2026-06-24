@@ -3,14 +3,14 @@
 #define SENSOR_WIDTH  4096
 #define SENSOR_HEIGHT  3072
 #define SENSOE_FPS 1
-#define RAW10 0x2B
+#define RAW14 0x2D
 
 static mipi_config_t ov50h40_mipi_config = {
 	.rx_enable = 1,
 	.rx_attr = {
 		.phy = 0,
 		.lane = 4,
-		.datatype = RAW10,
+		.datatype = RAW14,
 		.fps = SENSOE_FPS,
 		.mclk = 1,
 		.mipiclk = 5995,
@@ -19,8 +19,8 @@ static mipi_config_t ov50h40_mipi_config = {
 		.linelenth = 9216,
 		.framelenth = 4337,
 		.settle = 0,
-		.channel_num = 2,
-		.channel_sel = {0,1},
+		.channel_num = 1,
+		.channel_sel = {0},
 		.hsdTime = 0,
 		.hsaTime = 0,
 		.hbpTime = 0,
@@ -36,7 +36,7 @@ static camera_config_t ov50h40_camera_config = {
 	.addr = 0x21,
 	.sensor_mode = 1,
 	.fps = SENSOE_FPS,
-	.format = RAW10,
+	.format = RAW14,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.gpio_enable_bit = 0x01,
@@ -49,7 +49,7 @@ static vin_node_attr_t ov50h40_vin_node_attr = {
 	.cim_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
-		.ipi_channel = 2,
+		.ipi_channel = 1,
 		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
@@ -74,45 +74,22 @@ static vin_attr_ex_t ov50h40_vin_attr_ex = {
 static vin_ichn_attr_t ov50h40_vin_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
-	.format = RAW10,
+	.format = RAW14,
 };
 
 static vin_ochn_attr_t ov50h40_vin_ochn_attr = {
 	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
-		.format = RAW10,
+		.format = RAW14,
 		// 硬件 stride 跟格式匹配，通过行像素根据raw数据bit位数计算得来
-		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例raw10，1920 x 2 = 3840
+		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例RAW14，1920 x 2 = 3840
 		.wstride = (SENSOR_WIDTH) * 2,
-	},
-};
-
-static vin_ochn_attr_t ov50h40_vin_pdaf_ochn_attr = {
-	.ddr_en = 1,
-	.ochn_attr_type = VIN_PDAF_ATTR,
-	.pdaf_en = 1,
-	.vin_basic_attr = {
-		.format = RAW10,
-		// 硬件 stride 跟格式匹配，通过行像素根据raw数据bit位数计算得来
-		// 8bit：x1, 10bit: x2 12bit: x2 16bit: x2,例raw10，1920 x 2 = 3840
-		.wstride = (SENSOR_WIDTH) * 2,
-	},
-	.pdaf_attr = {
-		.pdaf_en = 1,
-		.pd_format = RAW10,
-		.pd_width = SENSOR_WIDTH,
-		.pd_height = 768,
-		.pd_ipi_channel = 1,
 	},
 };
 
 static isp_attr_t ov50h40_isp_attr = {
 	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
-	.af_mode =  1,
-	.pd_format = RAW10,
-	.pd_width = SENSOR_WIDTH,
-	.pd_height = 768,
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -126,7 +103,7 @@ static isp_ichn_attr_t ov50h40_isp_ichn_attr = {
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.fmt = FRM_FMT_RAW,
-	.bit_width = 10,
+	.bit_width = 14,
 };
 
 static isp_ochn_attr_t ov50h40_isp_ochn_attr = {
@@ -135,19 +112,18 @@ static isp_ochn_attr_t ov50h40_isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t ov50h40_linear_4096x3072_raw10_30fps_4lane = {
+vp_sensor_config_t ov50h40_linear_4096x3072_raw14_30fps_4lane = {
 	.chip_id_reg = 0x3035,
 	.chip_id = 0x6c,
 	.sensor_i2c_addr_list = {0x21},
 	.sensor_name = "ov50h40-30fps-4lane",
 	.support_sensor_mode  = {NORMAL_M},
-	.config_file = "linear_4096x3072_raw10_30fps_4lane.c",
+	.config_file = "linear_4096x3072_raw14_30fps_4lane.c",
 	.camera_config = &ov50h40_camera_config,
 	.vin_ichn_attr = &ov50h40_vin_ichn_attr,
 	.vin_node_attr = &ov50h40_vin_node_attr,
 	.vin_attr_ex   = &ov50h40_vin_attr_ex,
 	.vin_ochn_attr = &ov50h40_vin_ochn_attr,
-	.vin_pdaf_ochn_attr = &ov50h40_vin_pdaf_ochn_attr,
 	.isp_attr      = &ov50h40_isp_attr,
 	.isp_ichn_attr = &ov50h40_isp_ichn_attr,
 	.isp_ochn_attr = &ov50h40_isp_ochn_attr,

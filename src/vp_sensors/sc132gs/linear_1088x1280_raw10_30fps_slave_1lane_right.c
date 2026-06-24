@@ -1,7 +1,7 @@
 #include "vp_sensors.h"
 
-#define SENSOR_WIDTH  1600
-#define SENSOR_HEIGHT  1200
+#define SENSOR_WIDTH  1088
+#define SENSOR_HEIGHT  1280
 #define SENSOE_FPS 30
 #define RAW10 0x2B
 
@@ -13,11 +13,11 @@ static mipi_config_t mipi_config = {
 		.datatype = RAW10,
 		.fps = SENSOE_FPS,
 		.mclk = 1,
-		.mipiclk = 672,
+		.mipiclk = 1200,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 1792,
-		.framelenth = 1250,
+		.linelenth = 1400,
+		.framelenth = 1500,
 		.settle = 20,
 		.channel_num = 1,
 		.channel_sel = {0},
@@ -25,9 +25,9 @@ static mipi_config_t mipi_config = {
 };
 
 static camera_config_t camera_config = {
-	.name = "sc202cs",
-	.addr = 0x36,
-	.sensor_mode = 1,
+	.name = "sc132gs",
+	.addr = 0x32,
+	.sensor_mode = 6,
 	.fps = SENSOE_FPS,
 	.format = RAW10,
 	.width = SENSOR_WIDTH,
@@ -40,7 +40,7 @@ static camera_config_t camera_config = {
 
 static vin_node_attr_t vin_node_attr = {
 	.cim_attr = {
-		.mipi_rx = 0,
+		.mipi_rx = 1,
 		.vc_index = 0,
 		.ipi_channel = 1,
 		.cim_isp_flyby = 0,
@@ -50,7 +50,43 @@ static vin_node_attr_t vin_node_attr = {
 			.hdr_mode = NOT_HDR,
 			.time_stamp_en = 0,
 		},
-
+	},
+	.lpwm_attr = {
+		.enable = 1,
+		.lpwm_chn_attr = {
+			{	.trigger_source = 0,
+				.trigger_mode = 0,
+				.period = 33333,
+				.offset = 10,
+				.duty_time = 100,
+				.threshold = 0,
+				.adjust_step = 0,
+			},
+			{	.trigger_source = 0,
+				.trigger_mode = 0,
+				.period = 33333,
+				.offset = 10,
+				.duty_time = 100,
+				.threshold = 0,
+				.adjust_step = 0,
+			},
+			{	.trigger_source = 0,
+				.trigger_mode = 0,
+				.period = 33333,
+				.offset = 10,
+				.duty_time = 100,
+				.threshold = 0,
+				.adjust_step = 0,
+			},
+			{	.trigger_source = 0,
+				.trigger_mode = 0,
+				.period = 33333,
+				.offset = 10,
+				.duty_time = 100,
+				.threshold = 0,
+				.adjust_step = 0,
+			},
+		},
 	},
 };
 
@@ -79,7 +115,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
+	.input_mode = 2, // 0: online, 1: mcm, 类似offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -102,13 +138,12 @@ static isp_ochn_attr_t isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t sc202cs_linear_1600x1200_raw10_30fps_1lane = {
+vp_sensor_config_t sc132gs_linear_1088x1280_raw10_30fps_slave_1lane_right = {
 	.chip_id_reg = 0x3107,
-	.chip_id = 0xeb52,
-	.sensor_i2c_addr_list = {0x36},
-	.sensor_name = "sc202cs-1600x1200",
-	.support_sensor_mode  = {NORMAL_M},
-	.config_file = "linear_1600x1200_raw10_30fps_1lane.c",
+	.chip_id = 0x0132,
+	.sensor_i2c_addr_list = {0x32},
+	.sensor_name = "sc132gs-slave-right",
+	.config_file = "linear_1088x1280_raw10_30fps_slave_1lane_right.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,
 	.vin_node_attr = &vin_node_attr,

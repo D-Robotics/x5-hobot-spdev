@@ -53,7 +53,7 @@ static vin_node_attr_t vin_node_attr = {
 		.vc_index = 0,
 		.ipi_channel = 1,
 		// SIF online/offline ISP
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			// 帧id功能使能后会在raw图像开始位置添加帧id值
 			// ToF 数据的帧开始两个2字节不能被改写，所以这里不能使能 frame_id
@@ -92,7 +92,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = 0,
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	// 使用Linear模式
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
@@ -120,6 +120,7 @@ vp_sensor_config_t irs2381c_linear_224x1903_raw12_5fps_2lane = {
 	.chip_id_reg = 0xA0A4,
 	.chip_id = 0x2381,
 	.sensor_name = "irs2381c-tof",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_224x1903_raw12_5fps_2lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,

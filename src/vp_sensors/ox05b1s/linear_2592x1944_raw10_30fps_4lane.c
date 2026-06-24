@@ -43,7 +43,7 @@ static vin_node_attr_t vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -116,7 +116,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似 offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -145,6 +145,7 @@ vp_sensor_config_t ox05b1s_linear_2592x1944_raw10_30fps_4lane = {
 	.sensor_i2c_addr_list = { 0x36, 0x30, 0x33},
 	.sensor_type = SENSOR_TYPE_NORMAL,
 	.sensor_name = "ox05b1s",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_2592x1944_raw10_30fps_4lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,

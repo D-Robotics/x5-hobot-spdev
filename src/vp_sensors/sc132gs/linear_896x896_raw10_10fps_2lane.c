@@ -47,7 +47,7 @@ static vin_node_attr_t vin_node_attr = {
 		.mipi_rx = 2,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -120,7 +120,7 @@ static vin_ochn_attr_t vin_ochn_attr = {
 };
 
 static isp_attr_t isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -148,6 +148,7 @@ vp_sensor_config_t sc132gs_linear_896x896_raw10_10fps_2lane = {
 	.chip_id = 0x0132,
 	.sensor_i2c_addr_list = {0x30, 0x31, 0x32, 0x33},
 	.sensor_name = "sc132gs-896p",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_896x896_raw10_10fps_2lane.c",
 	.camera_config = &camera_config,
 	.vin_ichn_attr = &vin_ichn_attr,

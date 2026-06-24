@@ -43,7 +43,7 @@ static vin_node_attr_t sc230ai_vin_node_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
 		.ipi_channel = 1,
-		.cim_isp_flyby = 1,
+		.cim_isp_flyby = 0,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
@@ -105,7 +105,7 @@ static vin_ichn_attr_t sc230ai_vin_ichn_attr = {
 };
 
 static vin_ochn_attr_t sc230ai_vin_ochn_attr = {
-	.ddr_en = 0,
+	.ddr_en = 1,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
 		.format = RAW10,
@@ -116,7 +116,7 @@ static vin_ochn_attr_t sc230ai_vin_ochn_attr = {
 };
 
 static isp_attr_t sc230ai_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -144,6 +144,7 @@ vp_sensor_config_t sc230ai_linear_1920x1080_raw10_10fps_1lane = {
 	.chip_id = 0xcb34,
 	.sensor_i2c_addr_list = {0x30, 0x32},
 	.sensor_name = "sc230ai-10fps",
+	.support_sensor_mode  = {NORMAL_M, SLAVE_M}, //默认初始化为0， 并且 enum sensor_mode_e中 没有选用0
 	.config_file = "linear_1920x1080_raw10_10fps_1lane.c",
 	.camera_config = &sc230ai_camera_config,
 	.vin_ichn_attr = &sc230ai_vin_ichn_attr,

@@ -1,4 +1,5 @@
 #include "vp_sensors.h"
+#include "imx415_common.h"
 
 #define SENSOR_WIDTH  3840
 #define SENSOR_HEIGHT  2160
@@ -92,7 +93,7 @@ static vin_ochn_attr_t imx415_vin_ochn_attr = {
 };
 
 static isp_attr_t imx415_isp_attr = {
-	.input_mode = 1, // 0: online, 1: mcm, 类似offline
+	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
 	.sensor_mode= ISP_NORMAL_M,
 	.crop = {
 		.x = 0,
@@ -135,10 +136,12 @@ static n2d_config_t imx415_gpu2d_scale_crop_attr = {
 };
 
 vp_sensor_config_t imx415_linear_3480x2160_raw10_60fps_4lane = {
-	.chip_id_reg = 0x4001,
-	.chip_id = 0x03,
+	.chip_id_reg = IMX415_SENSOR_INFO,
+	.chip_id     = IMX415_CHIP_ID,
+	.read_chip_id_cb = imx415_read_chip_id,
 	.sensor_i2c_addr_list = {0x1A},
 	.sensor_name = "imx415-60fps-4lane",
+	.support_sensor_mode  = {NORMAL_M},
 	.config_file = "linear_3840x2160_raw10_60fps_4lane.c",
 	.camera_config = &imx415_camera_config,
 	.vin_ichn_attr = &imx415_vin_ichn_attr,

@@ -3,7 +3,7 @@
 
 #define SENSOR_WIDTH  3840
 #define SENSOR_HEIGHT  2160
-#define SENSOE_FPS 30
+#define SENSOR_FPS 30
 #define RAW10 0x2B
 
 static mipi_config_t imx415_mipi_config = {
@@ -12,16 +12,16 @@ static mipi_config_t imx415_mipi_config = {
 		.phy = 0,
 		.lane = 4,
 		.datatype = RAW10,
-		.fps = SENSOE_FPS,
-		.mclk = 24,
-		.mipiclk = 2880,
+		.fps = SENSOR_FPS,
+		.mclk = 1,
+		.mipiclk = 7128,
 		.width = SENSOR_WIDTH,
 		.height = SENSOR_HEIGHT,
-		.linelenth = 4400,
-		.framelenth = 2700,
+		.linelenth = 6400,
+		.framelenth = 4700,
 		.settle = 10,
-		.channel_num = 1,
-		.channel_sel = {0},
+		.channel_num = 2,
+		.channel_sel = {0,1},
 		.hsdTime = 0,
 		.hsaTime = 0,
 		.hbpTime = 0,
@@ -35,28 +35,28 @@ static mipi_config_t imx415_mipi_config = {
 static camera_config_t imx415_camera_config = {
 	.name = "imx415",
 	.addr = 0x1a,
-	.sensor_mode = 1,
-	.fps = SENSOE_FPS,
+	.sensor_mode = DOL2_M,
+	.fps = SENSOR_FPS,
 	.format = RAW10,
 	.width = SENSOR_WIDTH,
 	.height = SENSOR_HEIGHT,
 	.gpio_enable_bit = 0x01,
 	.gpio_level_bit = 0x00,
 	.mipi_cfg = &imx415_mipi_config,
-	.calib_lname = "disable",
-	.config_index = 1, //4lane
+	.calib_lname = "imx415_hdr_tuning.json",
+	// .calib_lname = "disable",
 };
 
 static vin_node_attr_t imx415_vin_node_attr = {
 	.cim_attr = {
 		.mipi_rx = 0,
 		.vc_index = 0,
-		.ipi_channel = 1,
-		.cim_isp_flyby = 0,
+		.ipi_channel = 2,
+		.cim_isp_flyby = 1,
 		.func = {
 			.enable_frame_id = 1,
 			.set_init_frame_id = 0,
-			.hdr_mode = NOT_HDR,
+			.hdr_mode = DOL_2,
 			.time_stamp_en = 0,
 		},
 
@@ -77,7 +77,7 @@ static vin_ichn_attr_t imx415_vin_ichn_attr = {
 };
 
 static vin_ochn_attr_t imx415_vin_ochn_attr = {
-	.ddr_en = 1,
+	.ddr_en = 0,
 	.ochn_attr_type = VIN_BASIC_ATTR,
 	.vin_basic_attr = {
 		.format = RAW10,
@@ -88,8 +88,9 @@ static vin_ochn_attr_t imx415_vin_ochn_attr = {
 };
 
 static isp_attr_t imx415_isp_attr = {
-	.input_mode = DDR_MODE, // PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
-	.sensor_mode= ISP_NORMAL_M,
+	.input_mode = PASSTHROUGH_MODE ,// PASSTHROUGH_MODE : online, MCM_MODE: 用于调试，DDR_MODE: offline
+	.sensor_mode= ISP_DOL2_M,
+	.tile_mode = 0,
 	.crop = {
 		.x = 0,
 		.y = 0,
@@ -111,14 +112,14 @@ static isp_ochn_attr_t imx415_isp_ochn_attr = {
 	.bit_width = 8,
 };
 
-vp_sensor_config_t imx415_linear_3480x2160_raw10_30fps_4lane = {
+vp_sensor_config_t imx415_dol2_3840x2160_raw10_30fps_4lane = {
 	.chip_id_reg = IMX415_SENSOR_INFO,
 	.chip_id     = IMX415_CHIP_ID,
 	.read_chip_id_cb = imx415_read_chip_id,
 	.sensor_i2c_addr_list = {0x1A},
-	.sensor_name = "imx415-30fps-4lane",
-	.support_sensor_mode  = {NORMAL_M},
-	.config_file = "linear_3840x2160_raw10_30fps_4lane.c",
+	.sensor_name = "imx415-30fps-4lane-dol2",
+	.support_sensor_mode  = {DOL2_M},
+	.config_file = "dol2_3840x2160_raw10_30fps_4lane.c",
 	.camera_config = &imx415_camera_config,
 	.vin_ichn_attr = &imx415_vin_ichn_attr,
 	.vin_node_attr = &imx415_vin_node_attr,

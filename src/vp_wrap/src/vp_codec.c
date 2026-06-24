@@ -117,8 +117,12 @@ int32_t AV_open_stream(vp_decode_param_t *p_param,
 		return -1;
 	}
 
-	// 获取视频流的帧数
+	// 获取视频流的帧数（FFmpeg 4: codec_info_nb_frames, FFmpeg 6: nb_frames）
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+	p_param->frame_count = (int32_t)(*p_avContext)->streams[video_idx]->nb_frames;
+#else
 	p_param->frame_count = (*p_avContext)->streams[video_idx]->codec_info_nb_frames;
+#endif
 
 	sem_post(&p_param->read_done);
 
@@ -1062,7 +1066,7 @@ void vp_decode_work_func(void *param)
 			{
 				avformat_close_input(&avContext);
 			}
-			if (dec_param->stream_path != NULL)
+			if (dec_param->stream_path[0] != '\0')
 			{
 				avContext = NULL;
 				memset(&avpacket, 0, sizeof(avpacket));

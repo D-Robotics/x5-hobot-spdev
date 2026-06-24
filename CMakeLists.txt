@@ -88,3 +88,4 @@ install(FILES ${SPDEV_BUILD_ROOT}/src/libhbspdev.so
     DESTINATION ${SPDEV_OUTPUT_ROOT}/)
 
 add_subdirectory(src)
+add_subdirectory(hbm_runtime)
